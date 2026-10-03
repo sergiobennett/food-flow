@@ -23,9 +23,17 @@ Food Flow adalah sistem informasi berbasis *desktop* yang dirancang untuk memper
 | :---: | :---: |
 | ![Dashboard](assets/dashboard.png) | ![Logistik](assets/logistik.png) |
 
-| Master Data | Autentikasi (Login) |
+| Master Data | Master Produk |
 | :---: | :---: |
-| ![Master Data](assets/master_data.png) | ![Login](assets/login.png) |
+| ![Master Data](assets/master_data.png) | ![Master Produk](assets/master_produk.png) |
+
+| Autentikasi (Login) | Autentikasi (Registrasi) |
+| :---: | :---: |
+| ![Login](assets/login.png) | ![Registrasi](assets/registrasi.png) |
+
+| Tambah Produk | Tambah Outlet |
+| :---: | :---: |
+| ![Tambah Produk](assets/tambah_produk.png) | ![Tambah Outlet](assets/tambah_outlet.png) |
 
 ## 🚀 Cara Menjalankan Projek (Getting Started)
 
@@ -37,4 +45,4 @@ Pastikan sistem sudah terpasang perangkat lunak berikut:
 ### Langkah-langkah Instalasi
 1. Kloning repositori ini:
    ```bash
-   git clone [https://github.com/username-kamu/food-flow.git](https://github.com/username-kamu/food-flow.git)
+  git clone https://github.com/sergiobennett/food-flow.git
