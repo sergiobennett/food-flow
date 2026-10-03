@@ -46,3 +46,24 @@ Pastikan sistem sudah terpasang perangkat lunak berikut:
 1. Kloning repositori ini:
    ```bash
   git clone https://github.com/sergiobennett/food-flow.git
+
+## 👥 Tim Pengembang
+* **Nama:** Sergio Bennett
+* **NIM / Kelas:** *(25082010202)*
+* **Program Studi:** Information Systems - UPN "Veteran" Jawa Timur
+* **Peran:** Hacker
+
+* **Nama:** Naila Izzah Kusumah
+* **NIM / Kelas:** *(25082010211)*
+* **Program Studi:** Information Systems - UPN "Veteran" Jawa Timur
+* **Peran:** Hipster
+
+* **Nama:** Bilovi Princessa K.
+* **NIM / Kelas:** *(25082010217)*
+* **Program Studi:** Information Systems - UPN "Veteran" Jawa Timur
+* **Peran:** Hustler
+
+* **Nama:** Yowin Timothy Napitupulu
+* **NIM / Kelas:** *(25082010226)*
+* **Program Studi:** Information Systems - UPN "Veteran" Jawa Timur
+* **Peran:** Leader
