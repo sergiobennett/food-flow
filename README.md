@@ -45,7 +45,7 @@ Pastikan sistem sudah terpasang perangkat lunak berikut:
 ### Langkah-langkah Instalasi
 1. Kloning repositori ini:
    ```bash
-  git clone https://github.com/sergiobennett/food-flow.git
+   git clone https://github.com/sergiobennett/food-flow.git
 
 ## 👥 Tim Pengembang
 * **Nama:** Sergio Bennett
