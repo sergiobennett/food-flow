@@ -1,26 +1,35 @@
 import 'package:flutter/material.dart';
-import 'database.dart';
+import 'pages/login_page.dart';
 
-Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
 
-// 1. connect ke database
-// await dipakai ketika memerlukan proses kode program yang perlu diselesaikan
-    final databaseConnection =await Database.connect();
-
-// 2. perform a sql query
-// menyimpan proses query sql ke sebuah variabel bernama 'studentQuery'
-//'mahasiswa' dapat diganti sesuai nama tabel yang dipakai
-    final studentQuery = await 
-                  databaseConnection.execute('SELECT * FROM actor');
-
-// 3. processing the query result into a variable
-for (final data in studentQuery.rows) {
-  print(data.assoc());
+void main() {
+  runApp(const FoodFlowApp());
 }
-  runApp(const MaterialApp(
-    home: Scaffold(
-      body: Center(child: Text('Database Connection Test')),
-    ),
-  ));
+
+
+class FoodFlowApp extends StatelessWidget {
+
+  const FoodFlowApp({super.key});
+
+
+  @override
+  Widget build(BuildContext context) {
+
+    return MaterialApp(
+
+      debugShowCheckedModeBanner: false,
+
+      title: 'FoodFlow',
+
+      theme: ThemeData(
+
+        primarySwatch: Colors.orange,
+
+      ),
+
+      home: const LoginPage(),
+
+    );
+
+  }
 }
