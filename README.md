@@ -17,7 +17,7 @@ Food Flow adalah sistem informasi berbasis *desktop* yang dirancang untuk memper
 * **Database:** MySQL
 * **Tools Lainnya:** Visual Studio Code, XAMPP / DBeaver
 
-## 📸 Pratinjau Antarmuka (Screenshots)
+## 📸 Pratinjau Antarmuka
 
 | Dashboard | Manajemen Logistik |
 | :---: | :---: |
