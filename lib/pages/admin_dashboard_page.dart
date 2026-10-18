@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'login_page.dart';
 import 'admin_setoran_page.dart';
 import 'admin_bagihasil_page.dart';
@@ -8,157 +9,171 @@ import 'admin_laporan_page.dart';
 class AdminDashboardPage extends StatelessWidget {
   const AdminDashboardPage({super.key});
 
-  @override
+  static const Color orange = Color(0xFFFF6B00);
+  static const Color background = Color(0xFFF2F6FB);
+  static const Color darkText = Color(0xFF1F2D42);
+  static const Color mutedText = Color(0xFF60738F);
+  static const Color sidebarTitle = Color(0xFF60738F);
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F6FB),
+      backgroundColor: background,
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ================= SIDEBAR =================
+          // =====================================================
+          // SIDEBAR
+          // =====================================================
+
           Container(
-            width: 155,
+            width: 180,
             color: Colors.white,
-            child: Column(
-              children: [
-                const SizedBox(height: 22),
-
-                const Text(
-                  'FOOD FLOW',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFFF6B00),
-                  ),
-                ),
-
-                const SizedBox(height: 25),
-
-                // MAIN MENU
-                _sideBox(
-                  context: context,
-                  title: 'MAIN MENU',
-                  items: const ['Dashboard'],
-                  activeIndex: 0,
-                ),
-
-                const SizedBox(height: 12),
-
-                // KEUANGAN
-                _sideBox(
-                  context: context,
-                  title: 'KEUANGAN',
-                  items: const [
-                    'Setoran',
-                    'Bagi Hasil',
-                    'Struk Transparansi',
-                  ],
-                  activeIndex: -1,
-                ),
-
-                const SizedBox(height: 12),
-
-                // LAPORAN
-                _sideBox(
-                  context: context,
-                  title: 'LAPORAN',
-                  items: const ['Laporan Keuangan'],
-                  activeIndex: -1,
-                ),
-
-                const Spacer(),
-                GestureDetector(
-                  onTap: () => _showLogoutDialog(context),
-                  child: const Padding(
-                    padding: EdgeInsets.only(bottom: 8),
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(
+                12,
+                25,
+                12,
+                20,
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Padding(
+                    padding: EdgeInsets.only(left: 23),
                     child: Text(
-                      '• Logout',
+                      'FOOD FLOW',
                       style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.red,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w900,
+                        color: orange,
                       ),
                     ),
                   ),
-                ),
 
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 15),
-                  child: Text(
-                    'Admin',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF60738F),
-                    ),
+                  const SizedBox(height: 32),
+
+                  // MAIN MENU
+                  _sideBox(
+                    context: context,
+                    title: 'MAIN MENU',
+                    items: const [
+                      'Dashboard',
+                    ],
+                    activeIndex: 0,
                   ),
-                ),
-              ],
+
+                  const SizedBox(height: 12),
+
+                  // KEUANGAN
+                  _sideBox(
+                    context: context,
+                    title: 'KEUANGAN',
+                    items: const [
+                      'Setoran',
+                      'Bagi Hasil',
+                      'Struk Transparansi',
+                    ],
+                    activeIndex: -1,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // LAPORAN
+                  _sideBox(
+                    context: context,
+                    title: 'LAPORAN',
+                    items: const [
+                      'Laporan Keuangan',
+                    ],
+                    activeIndex: -1,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  // AKUN: HANYA LOGOUT
+                  _sideBox(
+                    context: context,
+                    title: 'AKUN',
+                    items: const [
+                      'Logout',
+                    ],
+                    activeIndex: -1,
+                  ),
+                ],
+              ),
             ),
           ),
 
-          // ================= CONTENT =================
+          // =====================================================
+          // KONTEN UTAMA
+          // =====================================================
+
           Expanded(
             child: Column(
               children: [
-                // HEADER
+                // HEADER DASHBOARD
                 Container(
-                  height: 105,
-                  color: const Color(0xFFF2F6FB),
+                  height: 110,
+                  width: double.infinity,
                   padding: const EdgeInsets.only(
-                    left: 25,
+                    left: 28,
                     right: 35,
                   ),
                   child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
-                      const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'DASHBOARD ADMIN KEUANGAN',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F2D42),
+                      const Expanded(
+                        child: Column(
+                          mainAxisAlignment:
+                              MainAxisAlignment.center,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'DASHBOARD ADMIN KEUANGAN',
+                              style: TextStyle(
+                                fontSize: 21,
+                                fontWeight: FontWeight.w900,
+                                color: darkText,
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 3),
-                          Text(
-                            'Kelola data setoran, bagi hasil, dan struk transparansi',
-                            style: TextStyle(
-                              fontSize: 9,
-                              color: Color(0xFF60738F),
+                            SizedBox(height: 5),
+                            Text(
+                              'Kelola data setoran, bagi hasil, dan struk transparansi',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: mutedText,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
-
-                      const Spacer(),
-
-                      // ROLE ADMIN
+                      const SizedBox(width: 20),
+                      // BADGE AKTOR ADMIN: STATIS, TANPA INTERAKSI
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 11,
-                          vertical: 7,
+                          horizontal: 13,
+                          vertical: 8,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B00),
-                          borderRadius: BorderRadius.circular(7),
+                          color: orange,
+                          borderRadius: BorderRadius.circular(8),
                         ),
                         child: const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Admin',
                               style: TextStyle(
-                                fontSize: 13,
+                                fontSize: 17,
                                 fontWeight: FontWeight.bold,
                                 color: Colors.black,
                               ),
                             ),
-                            SizedBox(width: 3),
+                            SizedBox(width: 4),
                             Icon(
                               Icons.arrow_drop_down,
-                              size: 17,
+                              size: 20,
                               color: Colors.black,
                             ),
                           ],
@@ -168,49 +183,55 @@ class AdminDashboardPage extends StatelessWidget {
                   ),
                 ),
 
-                // ================= BODY =================
+                // BODY DASHBOARD
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.only(
-                      left: 60,
-                      right: 60,
-                      top: 40,
+                    padding: const EdgeInsets.fromLTRB(
+                      35,
+                      35,
+                      35,
+                      30,
                     ),
                     child: Column(
                       children: [
-                        // ================= STAT CARDS =================
+                        // KARTU STATISTIK
                         Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.center,
                           children: [
-                            _statCard(
-                              'Total Setoran',
-                              'Rp 4.250.000',
+                            Expanded(
+                              child: _statCard(
+                                title: 'Total Setoran',
+                                value: 'Rp 4.250.000',
+                              ),
                             ),
 
-                            const SizedBox(width: 38),
+                            const SizedBox(width: 25),
 
-                            _statCard(
-                              'Bagi Hasil',
-                              'Rp 1.275.000',
+                            Expanded(
+                              child: _statCard(
+                                title: 'Bagi Hasil',
+                                value: 'Rp 1.275.000',
+                              ),
                             ),
 
-                            const SizedBox(width: 38),
+                            const SizedBox(width: 25),
 
-                            _statCard(
-                              'Struk Terbit',
-                              '38',
+                            Expanded(
+                              child: _statCard(
+                                title: 'Struk Terbit',
+                                value: '38',
+                              ),
                             ),
                           ],
                         ),
 
                         const SizedBox(height: 65),
 
-                        // ================= SETORAN TERBARU =================
-                        Align(
-                          alignment: Alignment.center,
-                          child: SizedBox(
-                            width: 520,
+                        // SETORAN TERBARU
+                        Center(
+                          child: ConstrainedBox(
+                            constraints: const BoxConstraints(
+                              maxWidth: 650,
+                            ),
                             child: Column(
                               crossAxisAlignment:
                                   CrossAxisAlignment.start,
@@ -218,20 +239,29 @@ class AdminDashboardPage extends StatelessWidget {
                                 const Text(
                                   'Setoran Terbaru',
                                   style: TextStyle(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold,
+                                    fontSize: 22,
+                                    fontWeight: FontWeight.w900,
                                     color: Colors.black,
                                   ),
                                 ),
 
-                                const SizedBox(height: 10),
+                                const SizedBox(height: 12),
 
                                 Container(
-                                  padding: const EdgeInsets.all(14),
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
                                     borderRadius:
-                                        BorderRadius.circular(7),
+                                        BorderRadius.circular(9),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: Colors.black
+                                            .withOpacity(0.04),
+                                        blurRadius: 8,
+                                        offset: const Offset(0, 3),
+                                      ),
+                                    ],
                                   ),
                                   child: Column(
                                     children: [
@@ -244,7 +274,9 @@ class AdminDashboardPage extends StatelessWidget {
                                               '11:15',
                                             ),
                                           ),
+
                                           const SizedBox(width: 15),
+
                                           Expanded(
                                             child: _historyItem(
                                               'Outlet Sukolilo',
@@ -266,7 +298,9 @@ class AdminDashboardPage extends StatelessWidget {
                                               '13:00',
                                             ),
                                           ),
+
                                           const SizedBox(width: 15),
+
                                           Expanded(
                                             child: _historyItem(
                                               'Outlet Rungkut',
@@ -295,146 +329,25 @@ class AdminDashboardPage extends StatelessWidget {
     );
   }
 
-  // ================= SIDEBAR BOX =================
+  // =====================================================
+  // SIDEBAR BOX
+  // =====================================================
 
- // ================= SIDEBAR BOX =================
-
-static Widget _sideBox({
-  required BuildContext context,
-  required String title,
-  required List<String> items,
-  required int activeIndex,
-}) {
-  return Container(
-    width: 130,
-    padding: const EdgeInsets.symmetric(
-      horizontal: 10,
-      vertical: 8,
-    ),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF7EF),
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 8,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF60738F),
-          ),
-        ),
-
-        const SizedBox(height: 4),
-
-        ...List.generate(
-          items.length,
-          (index) {
-            return Padding(
-              padding: const EdgeInsets.only(bottom: 3),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  mouseCursor: SystemMouseCursors.click,
-                  onTap: () {
-                    _navigateAdmin(
-                      context,
-                      items[index],
-                    );
-                  },
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 22,
-                    child: Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '• ${items[index]}',
-                        style: TextStyle(
-                          fontSize: 9,
-                          color: index == activeIndex
-                              ? const Color(0xFFFF6B00)
-                              : const Color(0xFF60738F),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          },
-        ),
-      ],
-    ),
-  );
-}
-
-static void _navigateAdmin(
-  BuildContext context,
-  String item,
-) {
-  if (item == 'Dashboard') {
-    return;
-  }
-
-  if (item == 'Setoran') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminSetoranPage(),
-      ),
-    );
-  }
-
-  if (item == 'Bagi Hasil') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminBagiHasilPage(),
-      ),
-    );
-  }
-
-  if (item == 'Struk Transparansi') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const StrukTransparansiPage(),
-      ),
-    );
-  }
-
-  if (item == 'Laporan Keuangan') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminLaporanKeuanganPage(),
-      ),
-    );
-  }
-}
-
-  // ================= STAT CARD =================
-
-  static Widget _statCard(
-    String title,
-    String value,
-  ) {
+  static Widget _sideBox({
+    required BuildContext context,
+    required String title,
+    required List<String> items,
+    required int activeIndex,
+  }) {
     return Container(
-      width: 175,
-      height: 75,
-      padding: const EdgeInsets.all(12),
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 9,
+      ),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
-          BoxShadow(
-            color: Color(0x22000000),
-            blurRadius: 3,
-            offset: Offset(0, 2),
-          ),
-        ],
+        color: const Color(0xFFFFF7EF),
+        borderRadius: BorderRadius.circular(7),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -442,17 +355,153 @@ static void _navigateAdmin(
           Text(
             title,
             style: const TextStyle(
-              fontSize: 9,
-              color: Color(0xFF60738F),
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              color: sidebarTitle,
             ),
           ),
-          const SizedBox(height: 5),
+
+          const SizedBox(height: 7),
+
+          ...List.generate(
+            items.length,
+            (index) {
+              final String item = items[index];
+              final bool isActive = index == activeIndex;
+
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 5),
+                child: InkWell(
+                  mouseCursor: SystemMouseCursors.click,
+                  borderRadius: BorderRadius.circular(4),
+                  onTap: () {
+                    if (item == 'Logout') {
+                      _showLogoutDialog(context);
+                    } else {
+                      _navigateAdmin(context, item);
+                    }
+                  },
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 3,
+                      ),
+                      child: Text(
+                        '• $item',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: isActive
+                              ? FontWeight.bold
+                              : FontWeight.w500,
+                          color: orange,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // NAVIGASI ADMIN
+  // =====================================================
+
+  static void _navigateAdmin(
+    BuildContext context,
+    String item,
+  ) {
+    Widget? destination;
+
+    switch (item) {
+      case 'Dashboard':
+        destination = const AdminDashboardPage();
+        break;
+
+      case 'Setoran':
+        destination = const AdminSetoranPage();
+        break;
+
+      case 'Bagi Hasil':
+        destination = const AdminBagiHasilPage();
+        break;
+
+      case 'Struk Transparansi':
+        destination = const StrukTransparansiPage();
+        break;
+
+      case 'Laporan Keuangan':
+        destination = const AdminLaporanKeuanganPage();
+        break;
+    }
+
+    if (destination != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => destination!,
+        ),
+      );
+    }
+  }
+
+  // =====================================================
+  // KARTU STATISTIK
+  // =====================================================
+
+  static Widget _statCard({
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      constraints: const BoxConstraints(
+        minHeight: 82,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 15,
+        vertical: 15,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(11),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x22000000),
+            blurRadius: 5,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
           Text(
-            value,
+            title,
             style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Colors.black,
+              fontSize: 10,
+              color: mutedText,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+
+          const SizedBox(height: 7),
+
+          FittedBox(
+            fit: BoxFit.scaleDown,
+            alignment: Alignment.centerLeft,
+            child: Text(
+              value,
+              style: const TextStyle(
+                fontSize: 19,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+              ),
             ),
           ),
         ],
@@ -460,7 +509,9 @@ static void _navigateAdmin(
     );
   }
 
-  // ================= HISTORY ITEM =================
+  // =====================================================
+  // ITEM SETORAN TERBARU
+  // =====================================================
 
   static Widget _historyItem(
     String outlet,
@@ -468,34 +519,41 @@ static void _navigateAdmin(
     String time,
   ) {
     return Container(
-      height: 37,
+      constraints: const BoxConstraints(
+        minHeight: 43,
+      ),
       padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 5,
+        horizontal: 10,
+        vertical: 7,
       ),
       decoration: BoxDecoration(
         color: const Color(0xFFE4EBF4),
-        borderRadius: BorderRadius.circular(5),
+        borderRadius: BorderRadius.circular(6),
       ),
       child: Row(
         children: [
           Expanded(
             child: Column(
-              crossAxisAlignment:
-                  CrossAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   '• $outlet',
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: const TextStyle(
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF32629A),
                   ),
                 ),
+
+                const SizedBox(height: 3),
+
                 Text(
                   amount,
                   style: const TextStyle(
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                     color: Color(0xFF00A64F),
                   ),
@@ -504,10 +562,12 @@ static void _navigateAdmin(
             ),
           ),
 
+          const SizedBox(width: 5),
+
           Text(
             time,
             style: const TextStyle(
-              fontSize: 8,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
               color: Color(0xFF00A64F),
             ),
@@ -517,36 +577,48 @@ static void _navigateAdmin(
     );
   }
 
-  void _showLogoutDialog(BuildContext context) {
+  // =====================================================
+  // DIALOG LOGOUT
+  // =====================================================
+
+  static void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text(
             'Yakin ingin keluar?',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
+
           content: const Text(
             'Anda akan keluar dari akun FoodFlow saat ini.',
           ),
+
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
               child: const Text('Batal'),
             ),
+
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
+
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
+                    builder: (_) => const LoginPage(),
                   ),
                   (route) => false,
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF6B00),
+                backgroundColor: orange,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Ya'),

@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+
+import 'login_page.dart';
 import 'penjual_dashboard_page.dart';
 import 'pengambilan_stok_page.dart';
 import 'profil_penjual_page.dart';
+import 'penjual_sidebar.dart';
 
 class StrukTransparansiPage extends StatefulWidget {
   final List<Map<String, dynamic>> menu;
@@ -25,14 +28,14 @@ class _StrukTransparansiPageState
   // =========================================================
 
   static const Color orange = Color(0xFFFF7518);
-  static const Color peach = Color(0xFFFFF0E5);
+  static const Color peach = Color(0xFFFFF2E7);
   static const Color background = Color(0xFFF1F6FA);
   static const Color darkText = Color(0xFF26354A);
   static const Color greyText = Color(0xFF65758B);
   static const Color blueBorder = Color(0xFF1495FF);
 
   // =========================================================
-  // BUILD
+  // BUILD HALAMAN
   // =========================================================
 
   @override
@@ -40,83 +43,70 @@ class _StrukTransparansiPageState
     return Scaffold(
       backgroundColor: background,
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _buildSidebar(),
+          // SIDEBAR
+
+          PenjualSidebar(
+            activeItem: 'Struk Transparansi',
+            onSelected: _handleSidebarTap,
+          ),
+
+          // KONTEN UTAMA
 
           Expanded(
             child: Column(
               children: [
-                _buildTopBar(),
+                _buildHeader(),
 
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.fromLTRB(
-                      28,
-                      18,
-                      28,
-                      30,
+                      24,
+                      10,
+                      24,
+                      25,
                     ),
                     child: Column(
-                      crossAxisAlignment:
-                          CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
-                          'Struk Transparansi',
-                          style: TextStyle(
-                            fontSize: 21,
-                            fontWeight: FontWeight.bold,
-                            color: darkText,
-                          ),
-                        ),
-
-                        const SizedBox(height: 4),
-
-                        const Text(
-                          'Daftar stok yang perlu diambil hari ini.',
-                          style: TextStyle(
-                            fontSize: 8,
-                            color: greyText,
-                          ),
-                        ),
-
-                        const SizedBox(height: 18),
+                        // GREETING OUTLET
 
                         _buildGreeting(),
 
-                        const SizedBox(height: 17),
+                        const SizedBox(height: 14),
+
+                        // KARTU STRUK
 
                         Center(
                           child: _buildReceipt(),
                         ),
 
-                        const SizedBox(height: 18),
+                        const SizedBox(height: 15),
+
+                        // TOMBOL DETAIL
 
                         Center(
                           child: SizedBox(
-                            width: 70,
-                            height: 22,
+                            width: 88,
+                            height: 28,
                             child: ElevatedButton(
-                              onPressed: () {
-                                _showDetail();
-                              },
+                              onPressed: _showDetail,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: orange,
-                                foregroundColor:
-                                    Colors.white,
+                                foregroundColor: Colors.black,
                                 elevation: 0,
                                 padding: EdgeInsets.zero,
-                                shape:
-                                    RoundedRectangleBorder(
+                                shape: RoundedRectangleBorder(
                                   borderRadius:
-                                      BorderRadius.circular(6),
+                                      BorderRadius.circular(5),
                                 ),
                               ),
                               child: const Text(
                                 'Lihat Detail',
                                 style: TextStyle(
-                                  fontSize: 7,
-                                  fontWeight:
-                                      FontWeight.bold,
+                                  fontSize: 9,
+                                  fontWeight: FontWeight.bold,
                                 ),
                               ),
                             ),
@@ -135,162 +125,78 @@ class _StrukTransparansiPageState
   }
 
   // =========================================================
-  // SIDEBAR
+  // HEADER HALAMAN
   // =========================================================
 
-  Widget _buildSidebar() {
-    return Container(
-      width: 177,
-      color: Colors.white,
-      child: SafeArea(
-        child: Column(
-          crossAxisAlignment:
-              CrossAxisAlignment.start,
+  Widget _buildHeader() {
+    return SizedBox(
+      height: 84,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: 22,
+        ),
+        child: Row(
           children: [
-            const Padding(
-              padding: EdgeInsets.fromLTRB(
-                28,
-                30,
-                20,
-                25,
+            const Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Struk Transparansi',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w900,
+                      color: darkText,
+                    ),
+                  ),
+                  SizedBox(height: 3),
+                  Text(
+                    'Daftar stok yang perlu diambil hari ini.',
+                    style: TextStyle(
+                      fontSize: 9,
+                      color: greyText,
+                    ),
+                  ),
+                ],
               ),
-              child: Text(
-                'FOOD FLOW',
-                style: TextStyle(
-                  fontSize: 17,
-                  fontWeight: FontWeight.bold,
-                  color: orange,
-                ),
+            ),
+
+            const SizedBox(width: 10),
+
+            // ROLE PENJUAL
+
+            Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: 12,
+                vertical: 5,
               ),
-            ),
-
-            _sectionTitle('MAIN MENU'),
-            _sidebarItem(
-              'Dashboard',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const PenjualDashboardPage(),
+              decoration: BoxDecoration(
+                color: orange,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    'Penjual',
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black,
+                    ),
                   ),
-                );
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            _sectionTitle('STOK'),
-
-            _sidebarItem(
-              'Pengambilan Stok',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const PengambilanStokPage(),
+                  SizedBox(width: 3),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    size: 15,
+                    color: Colors.black,
                   ),
-                );
-              },
-            ),
-
-            _sidebarItem(
-              'Stok',
-              onTap: () {
-                _showInfo('Stok');
-              },
-            ),
-
-            const SizedBox(height: 16),
-
-            _sectionTitle('TRANSAKSI'),
-
-            _sidebarItem(
-              'Struk Transparansi',
-              selected: true,
-              onTap: () {},
-            ),
-
-            const SizedBox(height: 16),
-
-            _sectionTitle('AKUN'),
-
-            _sidebarItem(
-              'Profil',
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        const ProfilPenjualPage(),
-                  ),
-                );
-              },
-            ),
-
-            _sidebarItem(
-              'Logout',
-              logout: true,
-              onTap: () {
-                _showLogoutDialog();
-              },
+                ],
+              ),
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  // =========================================================
-  // TOP BAR
-  // =========================================================
-
-  Widget _buildTopBar() {
-    return Container(
-      height: 65,
-      color: background,
-      padding: const EdgeInsets.only(
-        left: 28,
-        right: 24,
-      ),
-      child: Row(
-        mainAxisAlignment:
-            MainAxisAlignment.end,
-        children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 15,
-              vertical: 9,
-            ),
-            decoration: BoxDecoration(
-              color: orange,
-              borderRadius:
-                  BorderRadius.circular(6),
-            ),
-            child: const Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  'Penjual',
-                  style: TextStyle(
-                    fontSize: 10,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-
-                SizedBox(width: 4),
-
-                Icon(
-                  Icons.arrow_drop_down,
-                  size: 16,
-                  color: Colors.white,
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -303,17 +209,15 @@ class _StrukTransparansiPageState
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
-        horizontal: 17,
-        vertical: 13,
+        horizontal: 14,
+        vertical: 11,
       ),
       decoration: BoxDecoration(
         color: peach,
-        borderRadius:
-            BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: const Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             'Halo, Bimuy 👋',
@@ -323,9 +227,7 @@ class _StrukTransparansiPageState
               color: Colors.black,
             ),
           ),
-
-          SizedBox(height: 10),
-
+          SizedBox(height: 14),
           Text(
             'OUTLET RUNGKUT',
             style: TextStyle(
@@ -340,33 +242,42 @@ class _StrukTransparansiPageState
   }
 
   // =========================================================
-  // RECEIPT
+  // KARTU STRUK
   // =========================================================
 
   Widget _buildReceipt() {
+    final int totalItem = widget.menu.fold<int>(
+      0,
+      (total, item) =>
+          total +
+          (int.tryParse(item['jumlah'].toString()) ?? 0),
+    );
+
     return Container(
-      width: 360,
-      height: 430,
+      width: 300,
+      constraints: const BoxConstraints(
+        maxWidth: 360,
+      ),
+      height: 342,
       padding: const EdgeInsets.fromLTRB(
-        32,
-        20,
-        32,
-        18,
+        26,
+        19,
+        26,
+        12,
       ),
       decoration: BoxDecoration(
         color: Colors.white,
+        borderRadius: BorderRadius.circular(10),
         border: Border.all(
-          color: blueBorder,
-          width: 2.2,
+          color: const Color(0xFFF0F0F0),
+          width: 0.5,
         ),
-        borderRadius:
-            BorderRadius.circular(14),
       ),
       child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // INFORMASI
+          // INFORMASI OUTLET
+
           _receiptInfo(
             'Outlet',
             'Rungkut',
@@ -382,36 +293,38 @@ class _StrukTransparansiPageState
             _formatTanggal(widget.tanggal),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 15),
+
+          // GARIS PEMISAH
 
           Container(
             height: 1,
-            width: 220,
-            color: Colors.grey,
+            width: double.infinity,
+            color: const Color(0xFF999999),
           ),
 
-          const SizedBox(height: 24),
+          const SizedBox(height: 18),
 
           // HEADER PRODUK
+
           const Row(
             children: [
               Expanded(
                 child: Text(
                   'Produk',
                   style: TextStyle(
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
                 ),
               ),
-
               SizedBox(
                 width: 55,
                 child: Text(
                   'Jumlah',
                   style: TextStyle(
-                    fontSize: 8,
+                    fontSize: 9,
                     fontWeight: FontWeight.bold,
                     color: Colors.black,
                   ),
@@ -420,97 +333,98 @@ class _StrukTransparansiPageState
             ],
           ),
 
-          const SizedBox(height: 14),
+          const SizedBox(height: 13),
 
-          // LIST PRODUK
+          // DAFTAR PRODUK
+
           if (widget.menu.isEmpty)
             const Text(
               'Belum ada data produk.',
               style: TextStyle(
-                fontSize: 8,
-                color: Colors.grey,
+                fontSize: 9,
+                color: greyText,
               ),
             )
           else
-            ...widget.menu.map(
-              (item) {
-                return Padding(
-                  padding:
-                      const EdgeInsets.only(
-                    bottom: 7,
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          item['nama']
-                              .toString(),
-                          style:
-                              const TextStyle(
-                            fontSize: 8,
-                            fontWeight:
-                                FontWeight.w500,
-                            color: Colors.black,
-                          ),
+            ...widget.menu.map((item) {
+              return Padding(
+                padding: const EdgeInsets.only(
+                  bottom: 4,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        item['nama'].toString(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          fontSize: 9,
+                          color: Colors.black,
                         ),
                       ),
-
-                      SizedBox(
-                        width: 55,
-                        child: Text(
-                          item['jumlah']
-                              .toString(),
-                          style:
-                              const TextStyle(
-                            fontSize: 8,
-                            fontWeight:
-                                FontWeight.w500,
-                            color: Colors.black,
-                          ),
+                    ),
+                    SizedBox(
+                      width: 55,
+                      child: Text(
+                        item['jumlah'].toString(),
+                        style: const TextStyle(
+                          fontSize: 9,
+                          color: Colors.black,
                         ),
                       ),
-                    ],
-                  ),
-                );
-              },
-            ),
+                    ),
+                  ],
+                ),
+              );
+            }),
 
           const SizedBox(height: 15),
 
+          // GARIS PEMISAH
+
           Container(
             height: 1,
-            width: 220,
-            color: Colors.grey,
+            width: double.infinity,
+            color: const Color(0xFF999999),
           ),
 
-          const SizedBox(height: 22),
+          const SizedBox(height: 17),
+
+          // TOTAL PENJUALAN
 
           const Text(
             'Total Penjualan : Rp350.000',
             style: TextStyle(
               fontSize: 9,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
           ),
 
-          const SizedBox(height: 18),
+          const SizedBox(height: 15),
+
+          // BAGI HASIL
 
           const Text(
             'Bagi Hasil : Rp105.000',
             style: TextStyle(
               fontSize: 9,
-              fontWeight: FontWeight.bold,
+              fontWeight: FontWeight.w600,
               color: Colors.black,
             ),
           ),
 
+          // MENDORONG STATUS KE BAGIAN BAWAH
+
           const Spacer(),
+
+          // STATUS
 
           const Text(
             'Status',
             style: TextStyle(
-              fontSize: 8,
+              fontSize: 9,
               fontWeight: FontWeight.bold,
               color: Colors.black,
             ),
@@ -519,22 +433,20 @@ class _StrukTransparansiPageState
           const SizedBox(height: 5),
 
           Container(
-            padding:
-                const EdgeInsets.symmetric(
+            padding: const EdgeInsets.symmetric(
               horizontal: 7,
               vertical: 3,
             ),
             decoration: BoxDecoration(
-              color: Colors.green,
-              borderRadius:
-                  BorderRadius.circular(4),
+              color: const Color(0xFF39CD70),
+              borderRadius: BorderRadius.circular(5),
             ),
             child: const Text(
               '✓ Selesai',
               style: TextStyle(
-                fontSize: 7,
+                fontSize: 8,
                 fontWeight: FontWeight.bold,
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
           ),
@@ -544,7 +456,7 @@ class _StrukTransparansiPageState
   }
 
   // =========================================================
-  // RECEIPT INFO
+  // INFORMASI STRUK
   // =========================================================
 
   Widget _receiptInfo(
@@ -553,17 +465,17 @@ class _StrukTransparansiPageState
   ) {
     return Padding(
       padding: const EdgeInsets.only(
-        bottom: 5,
+        bottom: 3,
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           SizedBox(
-            width: 55,
+            width: 39,
             child: Text(
               label,
               style: const TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
+                fontSize: 9,
                 color: Colors.black,
               ),
             ),
@@ -572,19 +484,18 @@ class _StrukTransparansiPageState
           const Text(
             ':',
             style: TextStyle(
-              fontSize: 8,
-              fontWeight: FontWeight.bold,
+              fontSize: 9,
+              color: Colors.black,
             ),
           ),
 
-          const SizedBox(width: 7),
+          const SizedBox(width: 5),
 
           Expanded(
             child: Text(
               value,
               style: const TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
+                fontSize: 9,
                 color: Colors.black,
               ),
             ),
@@ -595,85 +506,96 @@ class _StrukTransparansiPageState
   }
 
   // =========================================================
-  // DETAIL
+  // DIALOG DETAIL
   // =========================================================
 
   void _showDetail() {
-    showDialog(
+    final int totalItem = widget.menu.fold<int>(
+      0,
+      (total, item) =>
+          total +
+          (int.tryParse(item['jumlah'].toString()) ?? 0),
+    );
+
+    showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text(
             'Detail Struk Transparansi',
           ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment:
-                CrossAxisAlignment.start,
-            children: [
-              const Text(
-                'Outlet : Rungkut',
-              ),
-              const Text(
-                'Penjual : Andi',
-              ),
+          content: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text('Outlet : Rungkut'),
+                const Text('Penjual : Andi'),
 
-              const SizedBox(height: 10),
-
-              Text(
-                'Tanggal : ${_formatTanggal(widget.tanggal)}',
-              ),
-
-              const SizedBox(height: 15),
-
-              const Text(
-                'Produk:',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                Text(
+                  'Tanggal : ${_formatTanggal(widget.tanggal)}',
                 ),
-              ),
 
-              const SizedBox(height: 5),
+                const SizedBox(height: 12),
 
-              ...widget.menu.map(
-                (item) => Text(
-                  '• ${item['nama']} : ${item['jumlah']}',
+                const Text(
+                  'Daftar Produk:',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 15),
+                const SizedBox(height: 7),
 
-              const Text(
-                'Total Penjualan : Rp350.000',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                ...widget.menu.map((item) {
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                      bottom: 4,
+                    ),
+                    child: Text(
+                      '${item['nama']} : ${item['jumlah']}',
+                    ),
+                  );
+                }),
+
+                const SizedBox(height: 12),
+
+                Text(
+                  'Total Item : $totalItem',
                 ),
-              ),
 
-              const Text(
-                'Bagi Hasil : Rp105.000',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Total Penjualan : Rp350.000',
                 ),
-              ),
-            ],
+
+                const Text(
+                  'Bagi Hasil : Rp105.000',
+                ),
+
+                const SizedBox(height: 8),
+
+                const Text(
+                  'Status : Selesai',
+                  style: TextStyle(
+                    color: Colors.green,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
           ),
           actions: [
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                );
+                Navigator.pop(dialogContext);
               },
-              style:
-                  ElevatedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: orange,
-                foregroundColor:
-                    Colors.white,
+                foregroundColor: Colors.black,
               ),
-              child: const Text(
-                'Tutup',
-              ),
+              child: const Text('Tutup'),
             ),
           ],
         );
@@ -685,10 +607,8 @@ class _StrukTransparansiPageState
   // FORMAT TANGGAL
   // =========================================================
 
-  String _formatTanggal(
-    DateTime date,
-  ) {
-    const bulan = [
+  String _formatTanggal(DateTime date) {
+    const List<String> bulan = [
       'Januari',
       'Februari',
       'Maret',
@@ -709,110 +629,62 @@ class _StrukTransparansiPageState
   }
 
   // =========================================================
-  // SECTION TITLE
+  // NAVIGASI SIDEBAR
   // =========================================================
 
-  static Widget _sectionTitle(
-    String title,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.only(
-        left: 15,
-        bottom: 2,
-      ),
-      child: Text(
-        title,
-        style: const TextStyle(
-          fontSize: 6,
-          fontWeight: FontWeight.bold,
-          color: Colors.grey,
-        ),
-      ),
-    );
+  void _handleSidebarTap(String item) {
+    switch (item) {
+      case 'Dashboard':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const PenjualDashboardPage(),
+          ),
+        );
+        break;
+
+      case 'Pengambilan Stok':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const PengambilanStokPage(),
+          ),
+        );
+        break;
+
+      case 'Stok':
+        _showMessage(
+          'Halaman Stok belum tersedia.',
+        );
+        break;
+
+      case 'Struk Transparansi':
+        // Sudah berada di halaman ini.
+        break;
+
+      case 'Profil':
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (_) => const ProfilPenjualPage(),
+          ),
+        );
+        break;
+
+      case 'Logout':
+        _showLogoutDialog();
+        break;
+    }
   }
 
   // =========================================================
-  // SIDEBAR ITEM
+  // PESAN
   // =========================================================
 
-  static Widget _sidebarItem(
-    String title, {
-    bool selected = false,
-    bool logout = false,
-    required VoidCallback onTap,
-  }) {
-    return Padding(
-      padding:
-          const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 2,
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius:
-            BorderRadius.circular(5),
-        child: Container(
-          height: 27,
-          padding:
-              const EdgeInsets.symmetric(
-            horizontal: 9,
-          ),
-          decoration: BoxDecoration(
-            color: selected
-                ? peach
-                : Colors.transparent,
-            borderRadius:
-                BorderRadius.circular(5),
-          ),
-          alignment:
-              Alignment.centerLeft,
-          child: Row(
-            children: [
-              Text(
-                '•',
-                style: TextStyle(
-                  fontSize: 10,
-                  color: logout
-                      ? Colors.red
-                      : selected
-                          ? orange
-                          : greyText,
-                ),
-              ),
-
-              const SizedBox(width: 5),
-
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 8,
-                    color: logout
-                        ? Colors.red
-                        : selected
-                            ? orange
-                            : greyText,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // =========================================================
-  // INFO
-  // =========================================================
-
-  void _showInfo(String menuName) {
-    ScaffoldMessenger.of(context)
-        .showSnackBar(
+  void _showMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          '$menuName akan dibuka pada halaman berikutnya.',
-        ),
+        content: Text(message),
       ),
     );
   }
@@ -822,7 +694,7 @@ class _StrukTransparansiPageState
   // =========================================================
 
   void _showLogoutDialog() {
-    showDialog(
+    showDialog<void>(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
@@ -835,32 +707,27 @@ class _StrukTransparansiPageState
           actions: [
             TextButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                );
+                Navigator.pop(dialogContext);
               },
-              child: const Text(
-                'Batal',
-              ),
+              child: const Text('Batal'),
             ),
-
             ElevatedButton(
               onPressed: () {
-                Navigator.pop(
-                  dialogContext,
-                );
+                Navigator.pop(dialogContext);
 
-                Navigator.pop(context);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginPage(),
+                  ),
+                  (route) => false,
+                );
               },
-              style:
-                  ElevatedButton.styleFrom(
+              style: ElevatedButton.styleFrom(
                 backgroundColor: orange,
-                foregroundColor:
-                    Colors.white,
+                foregroundColor: Colors.white,
               ),
-              child: const Text(
-                'Ya',
-              ),
+              child: const Text('Ya'),
             ),
           ],
         );

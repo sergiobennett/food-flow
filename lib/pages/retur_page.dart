@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'login_page.dart';
 import 'dashboard_page.dart';
 import 'master_data_page.dart';
@@ -6,6 +7,21 @@ import 'distribusi_page.dart';
 import 'setoran_page.dart';
 import 'bagihasil_page.dart';
 import 'laporan_page.dart';
+import 'owner_sidebar.dart';
+
+// =========================================================
+// KONSTANTA WARNA
+// =========================================================
+
+const Color returOrange = Color(0xFFFF7100);
+const Color returBackground = Color(0xFFF0F5FA);
+const Color returDark = Color(0xFF263238);
+const Color returNavy = Color(0xFF031C2B);
+const Color returNavyLight = Color(0xFF0A2D40);
+
+// =========================================================
+// HALAMAN DAFTAR RETUR
+// =========================================================
 
 class ReturPage extends StatefulWidget {
   const ReturPage({super.key});
@@ -15,196 +31,312 @@ class ReturPage extends StatefulWidget {
 }
 
 class _ReturPageState extends State<ReturPage> {
+  final TextEditingController searchController =
+      TextEditingController();
+
+  String search = '';
+
+  // =====================================================
+  // DATA RETUR AWAL
+  // =====================================================
+
   final List<Map<String, String>> data = [
     {
-      "kode": "R001",
-      "tanggal": "21 Sep 2026",
-      "outlet": "A",
-      "penjual": "Andi",
-      "total": "5",
-      "status": "Diterima",
+      'kode': 'R001',
+      'tanggal': '21 Sep 2026',
+      'outlet': 'A',
+      'penjual': 'Andi',
+      'total': '5',
+      'status': 'Diterima',
+      'produk': 'Produk A',
+      'catatan': '',
     },
     {
-      "kode": "R002",
-      "tanggal": "21 Sep 2026",
-      "outlet": "B",
-      "penjual": "Budi",
-      "total": "3",
-      "status": "Diterima",
+      'kode': 'R002',
+      'tanggal': '21 Sep 2026',
+      'outlet': 'B',
+      'penjual': 'Budi',
+      'total': '3',
+      'status': 'Diterima',
+      'produk': 'Produk B',
+      'catatan': '',
     },
     {
-      "kode": "R003",
-      "tanggal": "20 Sep 2026",
-      "outlet": "C",
-      "penjual": "Citra",
-      "total": "7",
-      "status": "Diproses",
+      'kode': 'R003',
+      'tanggal': '20 Sep 2026',
+      'outlet': 'C',
+      'penjual': 'Citra',
+      'total': '7',
+      'status': 'Diproses',
+      'produk': 'Produk C',
+      'catatan': '',
     },
     {
-      "kode": "R004",
-      "tanggal": "22 Sep 2026",
-      "outlet": "B",
-      "penjual": "Budi",
-      "total": "3",
-      "status": "Diterima",
+      'kode': 'R004',
+      'tanggal': '22 Sep 2026',
+      'outlet': 'B',
+      'penjual': 'Budi',
+      'total': '3',
+      'status': 'Diterima',
+      'produk': 'Produk A',
+      'catatan': '',
     },
     {
-      "kode": "R005",
-      "tanggal": "23 Sep 2026",
-      "outlet": "C",
-      "penjual": "Citra",
-      "total": "5",
-      "status": "Diterima",
+      'kode': 'R005',
+      'tanggal': '23 Sep 2026',
+      'outlet': 'C',
+      'penjual': 'Citra',
+      'total': '5',
+      'status': 'Diterima',
+      'produk': 'Produk B',
+      'catatan': '',
     },
     {
-      "kode": "R006",
-      "tanggal": "24 Sep 2026",
-      "outlet": "B",
-      "penjual": "Budi",
-      "total": "7",
-      "status": "Diterima",
+      'kode': 'R006',
+      'tanggal': '24 Sep 2026',
+      'outlet': 'B',
+      'penjual': 'Budi',
+      'total': '7',
+      'status': 'Diterima',
+      'produk': 'Produk C',
+      'catatan': '',
     },
   ];
+
+  // =====================================================
+  // FILTER PENCARIAN
+  // =====================================================
+
+  List<Map<String, String>> get dataFilter {
+    if (search.trim().isEmpty) {
+      return data;
+    }
+
+    final query = search.toLowerCase().trim();
+
+    return data.where((item) {
+      return item.values.any(
+        (value) => value.toLowerCase().contains(query),
+      );
+    }).toList();
+  }
+
+  @override
+  void dispose() {
+    searchController.dispose();
+    super.dispose();
+  }
+
+  // =====================================================
+  // BUKA HALAMAN INPUT RETUR
+  // =====================================================
+
+  Future<void> _bukaInputRetur() async {
+    int nomorTerbesar = 0;
+
+    for (final item in data) {
+      final match = RegExp(
+        r'^R(\d+)$',
+      ).firstMatch(item['kode'] ?? '');
+
+      if (match != null) {
+        final nomor = int.parse(match.group(1)!);
+
+        if (nomor > nomorTerbesar) {
+          nomorTerbesar = nomor;
+        }
+      }
+    }
+
+    final kodeBaru =
+        'R${(nomorTerbesar + 1).toString().padLeft(3, '0')}';
+
+    final hasil = await Navigator.push<Map<String, String>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InputReturPage(
+          kode: kodeBaru,
+          isNew: true,
+        ),
+      ),
+    );
+
+    if (!mounted || hasil == null) return;
+
+    setState(() {
+      data.add(hasil);
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Retur berhasil ditambahkan.'),
+        backgroundColor: Color(0xFF16A34A),
+      ),
+    );
+  }
+
+  // =====================================================
+  // BUKA DETAIL RETUR
+  // =====================================================
+
+  Future<void> _bukaDetailRetur(
+    Map<String, String> item,
+  ) async {
+    final hasil = await Navigator.push<Map<String, String>>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => InputReturPage(
+          kode: item['kode'],
+          initialData: Map<String, String>.from(item),
+          isNew: false,
+        ),
+      ),
+    );
+
+    if (!mounted || hasil == null) return;
+
+    final index = data.indexWhere(
+      (element) => element['kode'] == item['kode'],
+    );
+
+    if (index == -1) return;
+
+    setState(() {
+      data[index] = hasil;
+    });
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text('Data retur berhasil diperbarui.'),
+        backgroundColor: Color(0xFF16A34A),
+      ),
+    );
+  }
+
+  // =====================================================
+  // BUILD HALAMAN RETUR
+  // =====================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: returBackground,
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _sidebar(context),
+          _ReturSidebar(
+            onReturTap: () {},
+          ),
 
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 30,
-                vertical: 28,
+              padding: const EdgeInsets.fromLTRB(
+                30,
+                52,
+                30,
+                25,
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // HEADER
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "RETUR",
-                            style: TextStyle(
-                              fontSize: 21,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
-                            ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Kelola pencatatan stok retur dari outlet dan penjual.",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF64748B),
-                            ),
-                          ),
-                        ],
-                      ),
-
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 15,
-                          vertical: 8,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFF7100),
-                          borderRadius:
-                              BorderRadius.circular(7),
-                        ),
-                        child: const Row(
+                      const Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              "Owner",
+                              'RETUR',
                               style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
+                                fontSize: 22,
+                                height: 1.2,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1E293B),
                               ),
                             ),
-                            SizedBox(width: 7),
-                            Icon(
-                              Icons.arrow_drop_down,
-                              color: Colors.black,
+                            SizedBox(height: 5),
+                            Text(
+                              'Kelola pencatatan stok retur dari outlet dan penjual.',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF64748B),
+                              ),
                             ),
                           ],
                         ),
                       ),
+                      const _ReturOwnerBadge(),
                     ],
                   ),
 
-                  const SizedBox(height: 35),
+                  const SizedBox(height: 38),
 
+                  // PENCARIAN DAN INPUT RETUR
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 255,
-                        height: 28,
-                        padding:
-                            const EdgeInsets.symmetric(
-                          horizontal: 10,
-                        ),
+                        width: 264,
+                        height: 30,
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(5),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFFE2E8F0),
+                          ),
                         ),
-                        child: const Row(
-                          children: [
-                            Icon(
+                        child: TextField(
+                          controller: searchController,
+                          onChanged: (value) {
+                            setState(() {
+                              search = value;
+                            });
+                          },
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: Color(0xFF334155),
+                          ),
+                          decoration: const InputDecoration(
+                            hintText: 'Cari retur...',
+                            hintStyle: TextStyle(
+                              fontSize: 9,
+                              color: Color(0xFF94A3B8),
+                            ),
+                            prefixIcon: Icon(
                               Icons.search,
-                              size: 13,
+                              size: 14,
                               color: Color(0xFF64748B),
                             ),
-                            SizedBox(width: 6),
-                            Text(
-                              "Cari retur...",
-                              style: TextStyle(
-                                fontSize: 10,
-                                color: Color(0xFF94A3B8),
-                              ),
+                            prefixIconConstraints: BoxConstraints(
+                              minWidth: 30,
                             ),
-                          ],
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(
+                              vertical: 7,
+                            ),
+                          ),
                         ),
                       ),
 
+                      const Spacer(),
+
                       ElevatedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  const InputReturPage(),
-                            ),
-                          );
-                        },
+                        onPressed: _bukaInputRetur,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFFFF7100),
+                          backgroundColor: returOrange,
                           foregroundColor: Colors.white,
                           elevation: 0,
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 10,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 23,
+                            vertical: 11,
                           ),
                           shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(6),
+                            borderRadius: BorderRadius.circular(6),
                           ),
                         ),
                         child: const Text(
-                          "Input Retur",
+                          'Input Retur',
                           style: TextStyle(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -214,44 +346,54 @@ class _ReturPageState extends State<ReturPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 18),
 
-                  _table(context),
+                  // TABEL DENGAN TINGGI TETAP
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 355,
+                        child: _buildTable(),
+                      ),
+                    ),
+                  ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 15),
 
-                  Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFFFF7100),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 35,
-                            vertical: 9,
+                  // TOMBOL KEMBALI
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const DashboardPage(),
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius:
-                                BorderRadius.circular(5),
-                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: returOrange,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 26,
+                          vertical: 12,
                         ),
-                        child: const Text(
-                          "KEMBALI",
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-                    ],
+                      child: const Text(
+                        'KEMBALI',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -262,232 +404,271 @@ class _ReturPageState extends State<ReturPage> {
     );
   }
 
-  Widget _table(BuildContext context) {
+  // =====================================================
+  // TABEL RETUR
+  // =====================================================
+
+  Widget _buildTable() {
     return Container(
+      width: double.infinity,
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(10),
-        boxShadow: const [
+        borderRadius: BorderRadius.circular(11),
+        boxShadow: [
           BoxShadow(
-            color: Color(0x22000000),
+            color: Colors.black.withOpacity(0.10),
             blurRadius: 7,
-            offset: Offset(0, 3),
+            offset: const Offset(0, 3),
           ),
         ],
       ),
       child: Column(
         children: [
-          _header(),
+          // HEADER TABEL
+          ClipRRect(
+            borderRadius: BorderRadius.circular(7),
+            child: Container(
+              height: 32,
+              color: const Color(0xFFFF6B2C),
+              child: Row(
+                children: [
+                  _tableHeader('KODE', 9),
+                  _tableDivider(),
+                  _tableHeader(
+                    'TANGGAL',
+                    12,
+                    icon: Icons.calendar_month_outlined,
+                  ),
+                  _tableDivider(),
+                  _tableHeader(
+                    'OUTLET',
+                    11,
+                    icon: Icons.storefront_outlined,
+                  ),
+                  _tableDivider(),
+                  _tableHeader(
+                    'PENJUAL',
+                    12,
+                    icon: Icons.person,
+                  ),
+                  _tableDivider(),
+                  _tableHeader(
+                    'TOTAL RETUR',
+                    13,
+                    icon: Icons.inventory_2_outlined,
+                  ),
+                  _tableDivider(),
+                  _tableHeader(
+                    'STATUS',
+                    13,
+                    icon: Icons.access_time,
+                  ),
+                  _tableDivider(),
+                  _tableHeader(
+                    'AKSI',
+                    10,
+                    icon: Icons.settings,
+                  ),
+                ],
+              ),
+            ),
+          ),
 
-          ...data.asMap().entries.map(
-            (entry) {
-              final index = entry.key;
-              final e = entry.value;
-
-              return Container(
-                height: 42,
-                color: index.isEven
-                    ? Colors.white
-                    : const Color(0xFFF7F9FC),
-                child: Row(
-                  children: [
-                    _cell(
-                      e["kode"]!,
-                      1,
-                      pill: true,
-                    ),
-                    _cell(
-                      e["tanggal"]!,
-                      2,
-                    ),
-                    _cell(
-                      e["outlet"]!,
-                      1,
-                    ),
-                    _cell(
-                      e["penjual"]!,
-                      1,
-                    ),
-                    _cell(
-                      e["total"]!,
-                      1,
-                    ),
-                    _status(
-                      e["status"]!,
-                      2,
-                    ),
-
-                    Expanded(
-                      flex: 1,
-                      child: Center(
-                        child: TextButton.icon(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (_) =>
-                                    const InputReturPage(),
-                              ),
-                            );
-                          },
-                          icon: const Icon(
-                            Icons.description_outlined,
-                            size: 14,
-                          ),
-                          label: const Text(
-                            "Detail",
-                            style: TextStyle(
-                              fontSize: 10,
-                            ),
-                          ),
-                          style: TextButton.styleFrom(
-                            foregroundColor:
-                                const Color(0xFF24364B),
-                            backgroundColor:
-                                const Color(0xFFEAF0F6),
-                          ),
-                        ),
+          // DATA
+          Expanded(
+            child: dataFilter.isEmpty
+                ? const Center(
+                    child: Text(
+                      'Data retur tidak ditemukan.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF64748B),
                       ),
                     ),
-                  ],
-                ),
-              );
-            },
+                  )
+                : ListView.separated(
+                    padding: EdgeInsets.zero,
+                    itemCount: dataFilter.length,
+                    separatorBuilder: (_, __) {
+                      return const Divider(
+                        height: 1,
+                        thickness: 0.5,
+                        color: Color(0xFFE9EEF4),
+                      );
+                    },
+                    itemBuilder: (context, index) {
+                      final item = dataFilter[index];
+
+                      return Container(
+                        height: 42,
+                        color: index.isOdd
+                            ? const Color(0xFFF7F9FC)
+                            : Colors.white,
+                        child: Row(
+                          children: [
+                            // KODE
+                            Expanded(
+                              flex: 9,
+                              child: Center(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 10,
+                                    vertical: 5,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE8EEF5),
+                                    borderRadius: BorderRadius.circular(15),
+                                  ),
+                                  child: Text(
+                                    item['kode'] ?? '',
+                                    style: const TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.bold,
+                                      color: Color(0xFF334155),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            _bodyDivider(),
+
+                            // TANGGAL
+                            _tableCell(
+                              item['tanggal'] ?? '',
+                              12,
+                            ),
+
+                            _bodyDivider(),
+
+                            // OUTLET
+                            _tableCell(
+                              item['outlet'] ?? '',
+                              11,
+                            ),
+
+                            _bodyDivider(),
+
+                            // PENJUAL
+                            _tableCell(
+                              item['penjual'] ?? '',
+                              12,
+                            ),
+
+                            _bodyDivider(),
+
+                            // TOTAL RETUR
+                            Expanded(
+                              flex: 13,
+                              child: Center(
+                                child: Text(
+                                  item['total'] ?? '0',
+                                  style: const TextStyle(
+                                    fontSize: 9,
+                                    fontWeight: FontWeight.bold,
+                                    color: Color(0xFF334155),
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            _bodyDivider(),
+
+                            // STATUS
+                            Expanded(
+                              flex: 13,
+                              child: Center(
+                                child: _statusBadge(
+                                  item['status'] ?? 'Diterima',
+                                ),
+                              ),
+                            ),
+
+                            _bodyDivider(),
+
+                            // DETAIL
+                            Expanded(
+                              flex: 10,
+                              child: Center(
+                                child: ElevatedButton.icon(
+                                  onPressed: () {
+                                    _bukaDetailRetur(item);
+                                  },
+                                  icon: const Icon(
+                                    Icons.description_outlined,
+                                    size: 13,
+                                  ),
+                                  label: const Text(
+                                    'Detail',
+                                    style: TextStyle(
+                                      fontSize: 9,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor:
+                                        const Color(0xFFE8EEF5),
+                                    foregroundColor:
+                                        const Color(0xFF334155),
+                                    elevation: 0,
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 9,
+                                      vertical: 6,
+                                    ),
+                                    minimumSize: Size.zero,
+                                    tapTargetSize:
+                                        MaterialTapTargetSize.shrinkWrap,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius:
+                                          BorderRadius.circular(7),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
     );
   }
 
-  Widget _header() {
-    final labels = [
-      "KODE",
-      "TANGGAL",
-      "OUTLET",
-      "PENJUAL",
-      "TOTAL RETUR",
-      "STATUS",
-      "AKSI",
-    ];
+  // =====================================================
+  // HEADER CELL
+  // =====================================================
 
-    final flexes = [
-      1,
-      2,
-      1,
-      1,
-      1,
-      2,
-      1,
-    ];
-
-    return Container(
-      height: 32,
-      decoration: BoxDecoration(
-        color: const Color(0xFFFF6B2C),
-        borderRadius: BorderRadius.circular(8),
-      ),
-      child: Row(
-        children: List.generate(
-          labels.length,
-          (index) => Expanded(
-            flex: flexes[index],
-            child: Center(
-              child: Text(
-                labels[index],
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 9,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _cell(
-    String text,
+  Widget _tableHeader(
+    String title,
     int flex, {
-    bool pill = false,
+    IconData? icon,
   }) {
     return Expanded(
       flex: flex,
       child: Center(
-        child: pill
-            ? Container(
-                padding:
-                    const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 5,
-                ),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFE8EEF5),
-                  borderRadius:
-                      BorderRadius.circular(12),
-                ),
-                child: Text(
-                  text,
-                  style: const TextStyle(
-                    fontSize: 9,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              )
-            : Text(
-                text,
-                style: const TextStyle(
-                  fontSize: 9,
-                ),
-              ),
-      ),
-    );
-  }
-
-  Widget _status(
-    String text,
-    int flex,
-  ) {
-    final bool diterima = text == "Diterima";
-
-    return Expanded(
-      flex: flex,
-      child: Center(
-        child: Container(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 9,
-            vertical: 5,
-          ),
-          decoration: BoxDecoration(
-            color: diterima
-                ? const Color(0xFFDDF6EC)
-                : const Color(0xFFFFEAD8),
-            borderRadius:
-                BorderRadius.circular(12),
-          ),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              Icon(
-                diterima
-                    ? Icons.check_circle
-                    : Icons.access_time,
-                size: 12,
-                color: diterima
-                    ? Colors.green
-                    : Colors.orange,
-              ),
-              const SizedBox(width: 4),
+              if (icon != null) ...[
+                Icon(
+                  icon,
+                  size: 11,
+                  color: Colors.white,
+                ),
+                const SizedBox(width: 4),
+              ],
               Text(
-                text,
-                style: TextStyle(
-                  fontSize: 8,
+                title,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 9,
                   fontWeight: FontWeight.bold,
-                  color: diterima
-                      ? Colors.green
-                      : Colors.orange,
                 ),
               ),
             ],
@@ -497,165 +678,83 @@ class _ReturPageState extends State<ReturPage> {
     );
   }
 
-  Widget _sidebar(BuildContext context) {
-  return Container(
-    width: 155,
-    color: Colors.white,
-    padding: const EdgeInsets.fromLTRB(15, 25, 10, 10),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Padding(
-          padding: EdgeInsets.only(left: 17),
-          child: Text(
-            "FOOD FLOW",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-              color: Color(0xFFFF6B00),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 28),
-
-        _sideBox(context, "MAIN MENU", ["Dashboard"]),
-        _sideBox(
-          context,
-          "MASTER DATA",
-          ["Produk", "Outlet", "Penjual"],
-        ),
-        _sideBox(
-          context,
-          "TRANSAKSI",
-          ["Distribusi", "Retur", "Setoran", "Bagi Hasil"],
-        ),
-        _sideBox(context, "LAPORAN", ["Laporan"]),
-        _sideBox(context, "AKUN", ["Profil", "LogOut"]),
-      ],
-    ),
-  );
-}
-
-void _showLogoutDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Yakin ingin keluar?', style: TextStyle(fontWeight: FontWeight.bold)),
-          content: const Text('Anda akan keluar dari akun FoodFlow saat ini.'),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(dialogContext), child: const Text('Batal')),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pop(dialogContext);
-                Navigator.pushAndRemoveUntil(
-                  context,
-                  MaterialPageRoute(builder: (_) => const LoginPage()),
-                  (route) => false,
-                );
-              },
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFFF7518), foregroundColor: Colors.white),
-              child: const Text('Ya'),
-            ),
-          ],
-        );
-      },
+  Widget _tableDivider() {
+    return Container(
+      width: 1,
+      height: 16,
+      color: Colors.white.withOpacity(0.25),
     );
   }
 
-Widget _sideBox(
-  BuildContext context,
-  String title,
-  List<String> items,
-  ) {
+  Widget _bodyDivider() {
     return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.fromLTRB(10, 5, 5, 6),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF7EF),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          InkWell(
-            onTap: () {
-              if (title == "MASTER DATA") {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => const MasterDataPage(),
-                  ),
-                );
-              }
-            },
-            borderRadius: BorderRadius.circular(5),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 3,
-              ),
-              child: Text(
-                title,
-                style: const TextStyle(
-                  fontSize: 7,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF64748B),
-                ),
-              ),
-            ),
-          ),
+      width: 1,
+      height: double.infinity,
+      color: const Color(0xFFF0F3F7),
+    );
+  }
 
-          ...items.map(
-            (item) => InkWell(
-              onTap: () {
-                if (item == "Distribusi") {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const DistribusiPage(),
-                    ),
-                  );
-                } else if (item == "Retur") {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const ReturPage(),
-                    ),
-                  );
-                } else if (item == "Setoran") {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const SetoranPage(),
-                    ),
-                  );
-                } else if (item == "Bagi Hasil") {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => const BagiHasilPage(),
-                    ),
-                  );
-                } else if (item == "LogOut") {
-                  _showLogoutDialog(context);
-                }
-              },
-              borderRadius: BorderRadius.circular(5),
-              child: Padding(
-                padding: const EdgeInsets.symmetric(
-                  vertical: 3,
-                ),
-                child: Text(
-                  "• $item",
-                  style: const TextStyle(
-                    fontSize: 10,
-                    color: Color(0xFFFF6B00),
-                    height: 1.5,
-                  ),
-                ),
-              ),
+  Widget _tableCell(
+    String text,
+    int flex,
+  ) {
+    return Expanded(
+      flex: flex,
+      child: Center(
+        child: Text(
+          text,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+          style: const TextStyle(
+            fontSize: 9,
+            color: Color(0xFF334155),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // STATUS BADGE
+  // =====================================================
+
+  Widget _statusBadge(String status) {
+    final bool diterima = status == 'Diterima';
+
+    final Color color = diterima
+        ? const Color(0xFF009B68)
+        : const Color(0xFFFF7900);
+
+    final Color backgroundColor = diterima
+        ? const Color(0xFFDDF6EC)
+        : const Color(0xFFFFF0E2);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            diterima
+                ? Icons.check_circle
+                : Icons.access_time,
+            size: 12,
+            color: color,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            status,
+            style: TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              color: color,
             ),
           ),
         ],
@@ -664,116 +763,330 @@ Widget _sideBox(
   }
 }
 
-// =====================================================
-// INPUT RETUR
-// =====================================================
+// =========================================================
+// HALAMAN INPUT RETUR
+// =========================================================
 
 class InputReturPage extends StatefulWidget {
-  const InputReturPage({super.key});
+  final String? kode;
+  final Map<String, String>? initialData;
+  final bool isNew;
+
+  const InputReturPage({
+    super.key,
+    this.kode,
+    this.initialData,
+    this.isNew = true,
+  });
 
   @override
-  State<InputReturPage> createState() =>
-      _InputReturPageState();
+  State<InputReturPage> createState() => _InputReturPageState();
 }
 
-class _InputReturPageState
-    extends State<InputReturPage> {
+class _InputReturPageState extends State<InputReturPage> {
+  late final TextEditingController tanggalController;
+  late final TextEditingController jumlahController;
+  late final TextEditingController catatanController;
+
   String? outlet;
   String? penjual;
   String? produk;
 
-  final TextEditingController jumlahController =
-      TextEditingController();
+  static const List<String> daftarOutlet = [
+    'Outlet A',
+    'Outlet B',
+    'Outlet C',
+  ];
 
-  final TextEditingController catatanController =
-      TextEditingController();
+  static const List<String> daftarPenjual = [
+    'Andi',
+    'Budi',
+    'Citra',
+  ];
+
+  static const List<String> daftarProduk = [
+    'Produk A',
+    'Produk B',
+    'Produk C',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    final initial = widget.initialData;
+
+    tanggalController = TextEditingController(
+      text: initial?['tanggal'] ?? '21 Sep 2026',
+    );
+
+    jumlahController = TextEditingController(
+      text: initial?['total'] ?? '',
+    );
+
+    catatanController = TextEditingController(
+      text: initial?['catatan'] ?? '',
+    );
+
+    final String? outletAwal = initial?['outlet'];
+
+    if (outletAwal != null) {
+      outlet = outletAwal.startsWith('Outlet ')
+          ? outletAwal
+          : 'Outlet $outletAwal';
+    }
+
+    final String? penjualAwal = initial?['penjual'];
+
+    if (penjualAwal != null &&
+        daftarPenjual.contains(penjualAwal)) {
+      penjual = penjualAwal;
+    }
+
+    final String? produkAwal = initial?['produk'];
+
+    if (produkAwal != null &&
+        daftarProduk.contains(produkAwal)) {
+      produk = produkAwal;
+    }
+  }
 
   @override
   void dispose() {
+    tanggalController.dispose();
     jumlahController.dispose();
     catatanController.dispose();
     super.dispose();
   }
 
+  // =====================================================
+  // PEMILIHAN TANGGAL
+  // HANYA ADA SATU DEKLARASI FUNGSI INI
+  // =====================================================
+
+  Future<void> _pilihTanggal() async {
+    const List<String> bulan = [
+      'Jan',
+      'Feb',
+      'Mar',
+      'Apr',
+      'Mei',
+      'Jun',
+      'Jul',
+      'Agu',
+      'Sep',
+      'Okt',
+      'Nov',
+      'Des',
+    ];
+
+    DateTime initialDate = DateTime(2026, 9, 21);
+
+    final parts = tanggalController.text.split(' ');
+
+    if (parts.length >= 3) {
+      final day = int.tryParse(parts[0]);
+      final monthIndex = bulan.indexOf(parts[1]);
+      final year = int.tryParse(parts[2]);
+
+      if (day != null &&
+          monthIndex >= 0 &&
+          year != null &&
+          day >= 1 &&
+          day <= 31) {
+        initialDate = DateTime(
+          year,
+          monthIndex + 1,
+          day,
+        );
+      }
+    }
+
+    final selectedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+      builder: (context, child) {
+        return Theme(
+          data: ThemeData.light().copyWith(
+            colorScheme: const ColorScheme.light(
+              primary: returOrange,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (selectedDate == null || !mounted) return;
+
+    setState(() {
+      tanggalController.text =
+          '${selectedDate.day} '
+          '${bulan[selectedDate.month - 1]} '
+          '${selectedDate.year}';
+    });
+  }
+
+  // =====================================================
+  // SIMPAN RETUR
+  // =====================================================
+
+  void _simpanRetur() {
+    if (tanggalController.text.trim().isEmpty) {
+      _pesan('Tanggal retur wajib diisi.');
+      return;
+    }
+
+    if (outlet == null) {
+      _pesan('Silakan pilih outlet.');
+      return;
+    }
+
+    if (penjual == null) {
+      _pesan('Silakan pilih penjual.');
+      return;
+    }
+
+    if (produk == null) {
+      _pesan('Silakan pilih produk.');
+      return;
+    }
+
+    final int? jumlah = int.tryParse(
+      jumlahController.text.trim(),
+    );
+
+    if (jumlah == null || jumlah <= 0) {
+      _pesan('Jumlah retur harus berupa angka lebih dari 0.');
+      return;
+    }
+
+    final String tanggal = tanggalController.text.trim();
+
+    final String outletSingkat =
+        outlet!.replaceFirst('Outlet ', '');
+
+    final Map<String, String> hasil = {
+      'kode': widget.kode ?? 'R001',
+      'tanggal': tanggal,
+      'outlet': outletSingkat,
+      'penjual': penjual!,
+      'total': jumlah.toString(),
+      'status': widget.initialData?['status'] ?? 'Diterima',
+      'produk': produk!,
+      'catatan': catatanController.text.trim(),
+    };
+
+    Navigator.pop<Map<String, String>>(
+      context,
+      hasil,
+    );
+  }
+
+  void _pesan(String pesan) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(pesan),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+
+  // =====================================================
+  // BUILD HALAMAN INPUT RETUR
+  // =====================================================
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF1F5F9),
+      backgroundColor: returBackground,
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          _sidebarInput(context),
+          _ReturSidebar(
+            onReturTap: () {
+              Navigator.pop(context);
+            },
+          ),
 
           Expanded(
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                horizontal: 30,
-                vertical: 28,
+              padding: const EdgeInsets.fromLTRB(
+                30,
+                52,
+                30,
+                25,
               ),
               child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  // HEADER
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Column(
-                        crossAxisAlignment:
-                            CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            "INPUT RETUR",
-                            style: TextStyle(
-                              fontSize: 21,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              widget.isNew
+                                  ? 'INPUT RETUR'
+                                  : 'DETAIL RETUR',
+                              style: const TextStyle(
+                                fontSize: 22,
+                                height: 1.2,
+                                fontWeight: FontWeight.w900,
+                                color: Color(0xFF1E293B),
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 5),
-                          Text(
-                            "Catat stok retur dari outlet pada akhir hari.",
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF64748B),
+                            const SizedBox(height: 5),
+                            const Text(
+                              'Catat stok retur dari outlet pada akhir hari.',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF64748B),
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
 
-                      _ownerButton(),
+                      const _ReturOwnerBadge(),
                     ],
                   ),
 
-                  const SizedBox(height: 35),
+                  const SizedBox(height: 38),
 
+                  // BARIS PENCARIAN DAN INPUT RETUR
                   Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
                     children: [
                       Container(
-                        width: 255,
-                        height: 28,
-                        padding:
-                            const EdgeInsets.symmetric(
+                        width: 264,
+                        height: 30,
+                        padding: const EdgeInsets.symmetric(
                           horizontal: 10,
                         ),
                         decoration: BoxDecoration(
                           color: Colors.white,
-                          borderRadius:
-                              BorderRadius.circular(5),
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(
+                            color: const Color(0xFFE2E8F0),
+                          ),
                         ),
                         child: const Row(
                           children: [
                             Icon(
                               Icons.search,
-                              size: 13,
+                              size: 14,
                               color: Color(0xFF64748B),
                             ),
                             SizedBox(width: 6),
                             Text(
-                              "Cari retur...",
+                              'Cari retur...',
                               style: TextStyle(
-                                fontSize: 10,
+                                fontSize: 9,
                                 color: Color(0xFF94A3B8),
                               ),
                             ),
@@ -781,250 +1094,73 @@ class _InputReturPageState
                         ),
                       ),
 
+                      const Spacer(),
+
                       ElevatedButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          FocusScope.of(context).unfocus();
+                        },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFFFF7100),
+                          backgroundColor: returOrange,
                           foregroundColor: Colors.white,
                           elevation: 0,
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 22,
-                            vertical: 10,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 23,
+                            vertical: 11,
+                          ),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(6),
                           ),
                         ),
                         child: const Text(
-                          "Input Retur",
+                          'Input Retur',
                           style: TextStyle(
                             fontSize: 10,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 22),
+                  const SizedBox(height: 24),
 
-                  Container(
+                  // PANEL FORM
+                  SizedBox(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF001B29),
-                      borderRadius:
-                          BorderRadius.circular(9),
-                      boxShadow: const [
-                        BoxShadow(
-                          color: Color(0x33000000),
-                          blurRadius: 7,
-                          offset: Offset(0, 4),
-                        ),
-                      ],
-                    ),
-                    child: Column(
-                      children: [
-                        Container(
-                          height: 25,
-                          padding:
-                              const EdgeInsets.symmetric(
-                            horizontal: 10,
-                          ),
-                          decoration: BoxDecoration(
-                            color:
-                                const Color(0xFF09283A),
-                            borderRadius:
-                                BorderRadius.circular(5),
-                          ),
-                          child: const Row(
-                            children: [
-                              Icon(
-                                Icons.inventory_2_outlined,
-                                color: Colors.white,
-                                size: 15,
-                              ),
-                              SizedBox(width: 10),
-                              Text(
-                                "Input Retur",
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight:
-                                      FontWeight.bold,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-
-                        const SizedBox(height: 10),
-
-                        _darkLabel("TANGGAL"),
-                        _darkField("21 Sep 2026"),
-
-                        _darkLabel("OUTLET"),
-                        _dropdown(
-                          outlet,
-                          "Pilih Outlet",
-                          [
-                            "Outlet A",
-                            "Outlet B",
-                            "Outlet C",
-                          ],
-                          (value) {
-                            setState(() {
-                              outlet = value;
-                            });
-                          },
-                        ),
-
-                        _darkLabel("PENJUAL"),
-                        _dropdown(
-                          penjual,
-                          "Pilih Penjual",
-                          [
-                            "Andi",
-                            "Budi",
-                            "Citra",
-                          ],
-                          (value) {
-                            setState(() {
-                              penjual = value;
-                            });
-                          },
-                        ),
-
-                        _darkLabel("PRODUK"),
-                        _dropdown(
-                          produk,
-                          "Pilih Produk",
-                          [
-                            "Produk A",
-                            "Produk B",
-                            "Produk C",
-                          ],
-                          (value) {
-                            setState(() {
-                              produk = value;
-                            });
-                          },
-                        ),
-
-                        _darkLabel("JUMLAH RETUR"),
-                        _darkInput(
-                          jumlahController,
-                          "Masukkan jumlah",
-                        ),
-
-                        _darkLabel("CATATAN"),
-                        _darkInput(
-                          catatanController,
-                          "Opsional",
-                        ),
-
-                        const SizedBox(height: 12),
-
-                        Row(
-                          mainAxisAlignment:
-                              MainAxisAlignment.end,
-                          children: [
-                            OutlinedButton(
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                              style:
-                                  OutlinedButton.styleFrom(
-                                foregroundColor:
-                                    Colors.white,
-                                side: const BorderSide(
-                                  color: Color(
-                                    0xFF355467,
-                                  ),
-                                ),
-                              ),
-                              child: const Text(
-                                "Batal",
-                                style: TextStyle(
-                                  fontSize: 9,
-                                ),
-                              ),
-                            ),
-
-                            const SizedBox(width: 10),
-
-                            ElevatedButton(
-                              onPressed: () {
-                                ScaffoldMessenger.of(
-                                  context,
-                                ).showSnackBar(
-                                  const SnackBar(
-                                    content: Text(
-                                      "Retur berhasil disimpan",
-                                    ),
-                                  ),
-                                );
-                              },
-                              style:
-                                  ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    const Color(0xFFFF6B00),
-                                foregroundColor:
-                                    Colors.white,
-                              ),
-                              child: const Text(
-                                "Simpan Retur",
-                                style: TextStyle(
-                                  fontSize: 9,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
+                    height: 334,
+                    child: _buildInputCard(),
                   ),
 
                   const Spacer(),
 
-                  Row(
-                    mainAxisAlignment:
-                        MainAxisAlignment.spaceBetween,
-                    children: [
-                      ElevatedButton(
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFFFF7100),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
+                  // KEMBALI
+                  Align(
+                    alignment: Alignment.centerRight,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: returOrange,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 26,
+                          vertical: 12,
                         ),
-                        child: const Text(
-                          "KEMBALI",
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(6),
                         ),
                       ),
-
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor:
-                              const Color(0xFFFF7100),
-                          foregroundColor: Colors.white,
-                          elevation: 0,
-                        ),
-                        child: const Text(
-                          "SELANJUTNYA",
-                          style: TextStyle(
-                            fontSize: 9,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      child: const Text(
+                        'KEMBALI',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ],
               ),
@@ -1035,122 +1171,378 @@ class _InputReturPageState
     );
   }
 
-  Widget _ownerButton() {
+  // =====================================================
+  // PANEL INPUT RETUR
+  // =====================================================
+
+  Widget _buildInputCard() {
     return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 15,
-        vertical: 8,
-      ),
+      width: double.infinity,
+      padding: const EdgeInsets.all(9),
       decoration: BoxDecoration(
-        color: const Color(0xFFFF7100),
-        borderRadius: BorderRadius.circular(7),
+        color: returNavy,
+        borderRadius: BorderRadius.circular(9),
+        border: Border.all(
+          color: const Color(0xFF17394A),
+          width: 1,
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.16),
+            blurRadius: 7,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
-      child: const Row(
+      child: Column(
         children: [
-          Text(
-            "Owner",
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
+          // HEADER PANEL
+          Container(
+            height: 25,
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+            ),
+            decoration: BoxDecoration(
+              color: returNavyLight,
+              borderRadius: BorderRadius.circular(5),
+              border: Border.all(
+                color: const Color(0xFF17394A),
+              ),
+            ),
+            child: const Row(
+              children: [
+                Icon(
+                  Icons.inventory_2_outlined,
+                  color: Colors.white,
+                  size: 15,
+                ),
+                SizedBox(width: 10),
+                VerticalDivider(
+                  width: 8,
+                  indent: 5,
+                  endIndent: 5,
+                  color: Color(0xFF28566B),
+                ),
+                SizedBox(width: 8),
+                Text(
+                  'Input Retur',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 10,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
             ),
           ),
-          SizedBox(width: 7),
-          Icon(Icons.arrow_drop_down),
+
+          const SizedBox(height: 9),
+
+          // FORM
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                // TANGGAL
+                _formField(
+                  'TANGGAL',
+                  _dateField(),
+                ),
+
+                const SizedBox(height: 5),
+
+                // OUTLET
+                _formField(
+                  'OUTLET',
+                  _dropdown(
+                    value: outlet,
+                    hint: 'Pilih Outlet',
+                    items: daftarOutlet,
+                    onChanged: (value) {
+                      setState(() {
+                        outlet = value;
+
+                        if (value == 'Outlet A') {
+                          penjual = 'Andi';
+                        } else if (value == 'Outlet B') {
+                          penjual = 'Budi';
+                        } else if (value == 'Outlet C') {
+                          penjual = 'Citra';
+                        }
+                      });
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // PENJUAL
+                _formField(
+                  'PENJUAL',
+                  _dropdown(
+                    value: penjual,
+                    hint: 'Pilih Penjual',
+                    items: daftarPenjual,
+                    onChanged: (value) {
+                      setState(() {
+                        penjual = value;
+                      });
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // PRODUK
+                _formField(
+                  'PRODUK',
+                  _dropdown(
+                    value: produk,
+                    hint: 'Pilih Produk',
+                    items: daftarProduk,
+                    onChanged: (value) {
+                      setState(() {
+                        produk = value;
+                      });
+                    },
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // JUMLAH RETUR
+                _formField(
+                  'JUMLAH RETUR',
+                  _textField(
+                    controller: jumlahController,
+                    hint: 'Masukkan jumlah',
+                    isNumber: true,
+                  ),
+                ),
+
+                const SizedBox(height: 5),
+
+                // CATATAN
+                _formField(
+                  'CATATAN',
+                  _textField(
+                    controller: catatanController,
+                    hint: 'Opsional',
+                  ),
+                ),
+
+                const Spacer(),
+
+                // TOMBOL BATAL DAN SIMPAN
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    TextButton.icon(
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                      icon: const Icon(
+                        Icons.close,
+                        size: 12,
+                      ),
+                      label: const Text(
+                        'Batal',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      style: TextButton.styleFrom(
+                        foregroundColor: const Color(0xFFA8B9C5),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 7,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(width: 6),
+
+                    ElevatedButton.icon(
+                      onPressed: _simpanRetur,
+                      icon: const Icon(
+                        Icons.save_outlined,
+                        size: 12,
+                      ),
+                      label: const Text(
+                        'Simpan Retur',
+                        style: TextStyle(
+                          fontSize: 9,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: returOrange,
+                        foregroundColor: Colors.white,
+                        elevation: 0,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 9,
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _darkLabel(String text) {
-    return Align(
-      alignment: Alignment.centerLeft,
-      child: Padding(
-        padding: const EdgeInsets.only(
-          top: 5,
-          bottom: 3,
-        ),
-        child: Text(
-          text,
+  // =====================================================
+  // LABEL DAN FIELD
+  // =====================================================
+
+  Widget _formField(
+    String label,
+    Widget field,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Text(
+          label,
           style: const TextStyle(
-            color: Colors.white,
+            color: Color(0xFFCBD5E1),
             fontSize: 7,
+            height: 1.1,
             fontWeight: FontWeight.bold,
           ),
         ),
-      ),
+        const SizedBox(height: 3),
+        field,
+      ],
     );
   }
 
-  Widget _darkField(String text) {
-    return Container(
-      width: double.infinity,
-      height: 21,
-      padding:
-          const EdgeInsets.symmetric(horizontal: 8),
-      alignment: Alignment.centerLeft,
-      decoration: BoxDecoration(
-        color: const Color(0xFF08283A),
-        borderRadius: BorderRadius.circular(4),
-        border: Border.all(
-          color: const Color(0xFF1B4053),
-        ),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Color(0xFFA8B9C5),
-          fontSize: 8,
-        ),
-      ),
-    );
-  }
+  // =====================================================
+  // FIELD TANGGAL
+  // =====================================================
 
-  Widget _darkInput(
-    TextEditingController controller,
-    String hint,
-  ) {
+  Widget _dateField() {
     return SizedBox(
-      height: 21,
+      height: 22,
       child: TextField(
-        controller: controller,
+        controller: tanggalController,
+        readOnly: true,
+        onTap: _pilihTanggal,
         style: const TextStyle(
           color: Colors.white,
           fontSize: 8,
         ),
-        decoration: InputDecoration(
-          hintText: hint,
-          hintStyle: const TextStyle(
+        decoration: _inputDecoration(
+          hint: 'Pilih tanggal retur',
+          suffixIcon: const Icon(
+            Icons.calendar_month,
+            size: 11,
             color: Color(0xFFA8B9C5),
-            fontSize: 8,
-          ),
-          filled: true,
-          fillColor: const Color(0xFF08283A),
-          contentPadding:
-              const EdgeInsets.symmetric(
-            horizontal: 8,
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius:
-                BorderRadius.circular(4),
-            borderSide: const BorderSide(
-              color: Color(0xFF1B4053),
-            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _dropdown(
-    String? value,
-    String hint,
-    List<String> items,
-    ValueChanged<String?> onChanged,
-  ) {
+  // =====================================================
+  // TEXT FIELD
+  // =====================================================
+
+  Widget _textField({
+    required TextEditingController controller,
+    required String hint,
+    bool isNumber = false,
+  }) {
+    return SizedBox(
+      height: 22,
+      child: TextField(
+        controller: controller,
+        keyboardType: isNumber
+            ? TextInputType.number
+            : TextInputType.text,
+        style: const TextStyle(
+          color: Colors.white,
+          fontSize: 8,
+        ),
+        decoration: _inputDecoration(
+          hint: hint,
+        ),
+      ),
+    );
+  }
+
+  InputDecoration _inputDecoration({
+    required String hint,
+    Widget? suffixIcon,
+  }) {
+    return InputDecoration(
+      hintText: hint,
+      hintStyle: const TextStyle(
+        color: Color(0xFFA8B9C5),
+        fontSize: 8,
+      ),
+      filled: true,
+      fillColor: const Color(0xFF082332),
+      isDense: true,
+      contentPadding: const EdgeInsets.symmetric(
+        horizontal: 8,
+        vertical: 5,
+      ),
+      suffixIcon: suffixIcon,
+      suffixIconConstraints: const BoxConstraints(
+        minWidth: 24,
+        minHeight: 20,
+      ),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: const BorderSide(
+          color: Color(0xFF1B4053),
+        ),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: const BorderSide(
+          color: Color(0xFF1B4053),
+        ),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(4),
+        borderSide: const BorderSide(
+          color: returOrange,
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // DROPDOWN
+  // =====================================================
+
+  Widget _dropdown({
+    required String? value,
+    required String hint,
+    required List<String> items,
+    required ValueChanged<String?> onChanged,
+  }) {
     return Container(
-      height: 21,
+      height: 22,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 8,
+      ),
       decoration: BoxDecoration(
-        color: const Color(0xFF08283A),
+        color: const Color(0xFF082332),
         borderRadius: BorderRadius.circular(4),
         border: Border.all(
           color: const Color(0xFF1B4053),
@@ -1159,160 +1551,199 @@ class _InputReturPageState
       child: DropdownButtonHideUnderline(
         child: DropdownButton<String>(
           value: value,
-          hint: Padding(
-            padding:
-                const EdgeInsets.symmetric(
-              horizontal: 8,
-            ),
-            child: Text(
-              hint,
-              style: const TextStyle(
-                color: Color(0xFFA8B9C5),
-                fontSize: 8,
-              ),
+          hint: Text(
+            hint,
+            style: const TextStyle(
+              color: Color(0xFFA8B9C5),
+              fontSize: 8,
             ),
           ),
           isExpanded: true,
-          dropdownColor:
-              const Color(0xFF08283A),
+          isDense: true,
+          dropdownColor: const Color(0xFF082332),
+          icon: const Icon(
+            Icons.keyboard_arrow_down,
+            size: 13,
+            color: Color(0xFFA8B9C5),
+          ),
           style: const TextStyle(
             color: Colors.white,
             fontSize: 8,
           ),
-          icon: const Icon(
-            Icons.keyboard_arrow_down,
-            color: Colors.white,
-            size: 14,
-          ),
-          items: items.map(
-            (item) {
-              return DropdownMenuItem<String>(
-                value: item,
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(
-                    horizontal: 8,
-                  ),
-                  child: Text(item),
-                ),
-              );
-            },
-          ).toList(),
+          items: items.map((item) {
+            return DropdownMenuItem<String>(
+              value: item,
+              child: Text(
+                item,
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
           onChanged: onChanged,
         ),
       ),
     );
   }
+}
 
-  Widget _sidebarInput(BuildContext context) {
-    return Container(
-      width: 155,
-      color: Colors.white,
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 25),
+// =========================================================
+// SIDEBAR RETUR
+// MENGGUNAKAN OWNER SIDEBAR BERSAMA
+// =========================================================
 
-          const Padding(
-            padding: EdgeInsets.symmetric(
-              horizontal: 28,
-            ),
-            child: Text(
-              "FOOD FLOW",
-              style: TextStyle(
-                fontSize: 17,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFFFF7100),
-              ),
-            ),
-          ),
+class _ReturSidebar extends StatelessWidget {
+  final VoidCallback onReturTap;
 
-          const SizedBox(height: 25),
+  const _ReturSidebar({
+    required this.onReturTap,
+  });
 
-          _inputMenu(
-            "MAIN MENU",
-            ["Dashboard"],
-          ),
+  @override
+  Widget build(BuildContext context) {
+    return OwnerSidebar(
+      activeItem: 'Retur',
+      onSelected: (item) => _handleMenuTap(context, item),
+    );
+  }
 
-          _inputMenu(
-            "MASTER DATA",
-            ["Produk", "Outlet", "Penjual"],
-          ),
+  // =====================================================
+  // NAVIGASI SIDEBAR OWNER
+  // =====================================================
 
-          _inputMenu(
-            "TRANSAKSI",
-            [
-              "Distribusi",
-              "Retur",
-              "Setoran",
-              "Bagi Hasil",
-            ],
-          ),
+  void _handleMenuTap(BuildContext context, String item) {
+    switch (item) {
+      case 'Dashboard':
+        _goTo(context, const DashboardPage());
+        break;
 
-          _inputMenu(
-            "LAPORAN",
-            ["Laporan"],
-          ),
+      case 'Produk':
+      case 'Outlet':
+      case 'Penjual':
+        _goTo(context, const MasterDataPage());
+        break;
 
-          _inputMenu(
-            "AKUN",
-            ["Profil", "LogOut"],
-          ),
-        ],
+      case 'Distribusi':
+        _goTo(context, const DistribusiPage());
+        break;
+
+      case 'Retur':
+        onReturTap();
+        break;
+
+      case 'Setoran':
+        _goTo(context, const SetoranPage());
+        break;
+
+      case 'Bagi Hasil':
+        _goTo(context, const BagiHasilPage());
+        break;
+
+      case 'Laporan':
+        _goTo(context, const LaporanPage());
+        break;
+
+      case 'Logout':
+        _showLogoutDialog(context);
+        break;
+    }
+  }
+
+  // =====================================================
+  // PINDAH HALAMAN
+  // =====================================================
+
+  void _goTo(BuildContext context, Widget page) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => page,
       ),
     );
   }
 
-  Widget _inputMenu(
-    String title,
-    List<String> items,
-  ) {
-    return Container(
-      margin: const EdgeInsets.only(
-        left: 10,
-        right: 10,
-        bottom: 10,
-      ),
-      padding: const EdgeInsets.symmetric(
-        vertical: 6,
-      ),
-      decoration: BoxDecoration(
-        color: const Color(0xFFFFF5EC),
-        borderRadius: BorderRadius.circular(6),
-      ),
-      child: Column(
-        crossAxisAlignment:
-            CrossAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-            ),
-            child: Text(
-              title,
-              style: const TextStyle(
-                fontSize: 8,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF64748B),
-              ),
+  // =====================================================
+  // LOGOUT
+  // =====================================================
+
+  void _showLogoutDialog(BuildContext context) {
+    showDialog<void>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text(
+            'Yakin ingin keluar?',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
             ),
           ),
-          ...items.map(
-            (item) => Padding(
-              padding:
-                  const EdgeInsets.symmetric(
-                horizontal: 10,
-                vertical: 3,
-              ),
-              child: Text(
-                "• $item",
-                style: const TextStyle(
-                  fontSize: 10,
-                  color: Color(0xFFFF7100),
-                ),
-              ),
+          content: const Text(
+            'Anda akan keluar dari akun FoodFlow saat ini.',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
+              child: const Text('Batal'),
             ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext);
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginPage(),
+                  ),
+                  (route) => false,
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: returOrange,
+                foregroundColor: Colors.white,
+              ),
+              child: const Text('Ya'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+}
+
+// =========================================================
+// OWNER BADGE
+// =========================================================
+
+class _ReturOwnerBadge extends StatelessWidget {
+  const _ReturOwnerBadge();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 9,
+        vertical: 5,
+      ),
+      decoration: BoxDecoration(
+        color: returOrange,
+        borderRadius: BorderRadius.circular(7),
+      ),
+      child: const Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            'Owner',
+            style: TextStyle(
+              fontSize: 15,
+              fontWeight: FontWeight.bold,
+              color: Colors.black,
+            ),
+          ),
+          SizedBox(width: 4),
+          Icon(
+            Icons.arrow_drop_down,
+            size: 18,
+            color: Colors.black,
           ),
         ],
       ),

@@ -13,15 +13,33 @@ class AdminSetoranPage extends StatefulWidget {
 }
 
 class _AdminSetoranPageState extends State<AdminSetoranPage> {
+  static const Color orange = Color(0xFFFF6B00);
+  static const Color background = Color(0xFFF2F6FB);
+  static const Color mutedText = Color(0xFF60738F);
+  static const Color sidebarTitle = Color(0xFF60738F);
+
   final TextEditingController nominalController =
-    TextEditingController();
+      TextEditingController();
 
   final TextEditingController catatanController =
       TextEditingController();
 
-  String tanggal = '20 September 2026';
+  DateTime selectedDate = DateTime(2026, 9, 20);
+
   String outlet = '';
   String produk = '';
+
+  @override
+  void dispose() {
+    nominalController.dispose();
+    catatanController.dispose();
+    super.dispose();
+  }
+
+  // =====================================================
+  // FORMAT TANGGAL
+  // =====================================================
+
   String _namaBulan(int bulan) {
     const namaBulan = [
       '',
@@ -42,194 +60,191 @@ class _AdminSetoranPageState extends State<AdminSetoranPage> {
     return namaBulan[bulan];
   }
 
-  void _pilihOutlet() {
-    showDialog(
+  String get tanggal =>
+      '${selectedDate.day} '
+      '${_namaBulan(selectedDate.month)} '
+      '${selectedDate.year}';
+
+  // =====================================================
+  // PILIH OUTLET
+  // =====================================================
+
+  Future<void> _pilihOutlet() async {
+    final String? pilihan = await showDialog<String>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return SimpleDialog(
-          title: const Text('Pilih Outlet'),
+          title: const Text(
+            'Pilih Outlet',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           children: [
             'Rungkut',
             'Sukolilo',
             'Wonokromo',
-          ].map(
-            (item) {
-              return SimpleDialogOption(
-                onPressed: () {
-                  setState(() {
-                    outlet = item;
-                  });
-                  Navigator.pop(context);
-                },
-                child: Text(item),
-              );
-            },
-          ).toList(),
+          ].map((item) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(dialogContext, item);
+              },
+              child: Text(item),
+            );
+          }).toList(),
         );
       },
     );
+
+    if (!mounted) return;
+
+    if (pilihan != null) {
+      setState(() {
+        outlet = pilihan;
+      });
+    }
   }
 
-  void _pilihProduk() {
-    showDialog(
+  // =====================================================
+  // PILIH PRODUK
+  // =====================================================
+
+  Future<void> _pilihProduk() async {
+    final String? pilihan = await showDialog<String>(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return SimpleDialog(
-          title: const Text('Pilih Produk'),
+          title: const Text(
+            'Pilih Produk',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
           children: [
             'Produk A',
             'Produk B',
             'Produk C',
-          ].map(
-            (item) {
-              return SimpleDialogOption(
-                onPressed: () {
-                  setState(() {
-                    produk = item;
-                  });
-                  Navigator.pop(context);
-                },
-                child: Text(item),
-              );
-            },
-          ).toList(),
+          ].map((item) {
+            return SimpleDialogOption(
+              onPressed: () {
+                Navigator.pop(dialogContext, item);
+              },
+              child: Text(item),
+            );
+          }).toList(),
         );
       },
     );
+
+    if (!mounted) return;
+
+    if (pilihan != null) {
+      setState(() {
+        produk = pilihan;
+      });
+    }
   }
+
+  // =====================================================
+  // PILIH TANGGAL
+  // =====================================================
+
+  Future<void> _pilihTanggal() async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: selectedDate,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2035),
+    );
+
+    if (!mounted) return;
+
+    if (picked != null) {
+      setState(() {
+        selectedDate = picked;
+      });
+    }
+  }
+
+  // =====================================================
+  // BUILD
+  // =====================================================
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF2F6FB),
+      backgroundColor: background,
       body: Row(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // ================= SIDEBAR =================
-          Container(
-            width: 150,
-            color: Colors.white,
-            child: Column(
-              children: [
-                const SizedBox(height: 22),
+          // =================================================
+          // SIDEBAR
+          // =================================================
 
-                const Text(
-                  'FOOD FLOW',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFFFF6B00),
-                  ),
-                ),
+          _buildSidebar(),
 
-                const SizedBox(height: 25),
+          // =================================================
+          // KONTEN UTAMA
+          // =================================================
 
-                _sideBox(
-                  context: context,
-                  title: 'MAIN MENU',
-                  items: const ['Dashboard'],
-                  activeIndex: -1,
-                ),
-
-                const SizedBox(height: 12),
-
-                _sideBox(
-                  context: context,
-                  title: 'KEUANGAN',
-                  items: const [
-                    'Setoran',
-                    'Bagi Hasil',
-                    'Struk Transparansi',
-                  ],
-                  activeIndex: 0,
-                ),
-
-                const SizedBox(height: 12),
-
-                _sideBox(
-                  context: context,
-                  title: 'LAPORAN',
-                  items: const ['Laporan Keuangan'],
-                  activeIndex: -1,
-                ),
-
-                const Spacer(),
-                GestureDetector(
-                  onTap: () => _showLogoutDialog(context),
-                  child: const Padding(
-                    padding: EdgeInsets.only(bottom: 8),
-                    child: Text(
-                      '• Logout',
-                      style: TextStyle(
-                        fontSize: 10,
-                        color: Colors.red,
-                      ),
-                    ),
-                  ),
-                ),
-
-                const Padding(
-                  padding: EdgeInsets.only(bottom: 15),
-                  child: Text(
-                    'Admin',
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Color(0xFF60738F),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // ================= CONTENT =================
           Expanded(
             child: Column(
               children: [
-                // ================= HEADER =================
+                // =============================================
+                // HEADER
+                // =============================================
+
                 Container(
                   height: 105,
+                  width: double.infinity,
                   padding: const EdgeInsets.only(
                     left: 20,
                     right: 50,
                   ),
                   child: Row(
                     children: [
-                      const Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'INPUT SETORAN',
-                            style: TextStyle(
-                              fontSize: 20,
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFF1F2D42),
+                      const Expanded(
+                        child: Column(
+                          mainAxisAlignment:
+                              MainAxisAlignment.center,
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'INPUT SETORAN',
+                              style: TextStyle(
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
+                                color: Color(0xFF1F2D42),
+                              ),
                             ),
-                          ),
-                          SizedBox(height: 3),
-                          Text(
-                            'Masukkan data uang setoran dari outlet',
-                            style: TextStyle(
-                              fontSize: 9,
-                              color: Color(0xFF60738F),
+                            SizedBox(height: 3),
+                            Text(
+                              'Masukkan data uang setoran dari outlet',
+                              style: TextStyle(
+                                fontSize: 9,
+                                color: mutedText,
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
 
-                      const Spacer(),
+                      const SizedBox(width: 15),
 
-                      // ADMIN
+                      // ROLE ADMIN
+
                       Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 11,
                           vertical: 7,
                         ),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFFF6B00),
+                          color: orange,
                           borderRadius: BorderRadius.circular(7),
                         ),
                         child: const Row(
+                          mainAxisSize: MainAxisSize.min,
                           children: [
                             Text(
                               'Admin',
@@ -252,216 +267,166 @@ class _AdminSetoranPageState extends State<AdminSetoranPage> {
                   ),
                 ),
 
-                // ================= BODY =================
+                // =============================================
+                // FORM INPUT SETORAN
+                // =============================================
+
                 Expanded(
                   child: Center(
-                    child: Container(
-                      width: 520,
-                      height: 465,
-                      padding: const EdgeInsets.fromLTRB(
-                        90,
-                        15,
-                        90,
-                        20,
-                      ),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(10),
-                        boxShadow: const [
-                          BoxShadow(
-                            color: Color(0x22000000),
-                            blurRadius: 3,
-                            offset: Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          _label('Tanggal'),
-
-                          InkWell(
-                            onTap: () async {
-                              final DateTime? picked = await showDatePicker(
-                                context: context,
-                                initialDate: DateTime(2026, 9, 20),
-                                firstDate: DateTime(2020),
-                                lastDate: DateTime(2035),
-                              );
-
-                              if (picked != null) {
-                                setState(() {
-                                  tanggal =
-                                      '${picked.day} ${_namaBulan(picked.month)} ${picked.year}';
-                                });
-                              }
-                            },
-                            child: _field(tanggal),
-                          ),
-
-                          const SizedBox(height: 10),
-
-                          _label('Outlet'),
-
-                          InkWell(
-                            onTap: () {
-                              _pilihOutlet();
-                            },
-                            child: _field(
-                              outlet.isEmpty ? 'Pilih Outlet ▼' : outlet,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(20),
+                      child: Container(
+                        width: 560,
+                        constraints: const BoxConstraints(
+                          minHeight: 465,
+                        ),
+                        padding: const EdgeInsets.fromLTRB(
+                          90,
+                          20,
+                          90,
+                          22,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(11),
+                          boxShadow: const [
+                            BoxShadow(
+                              color: Color(0x22000000),
+                              blurRadius: 5,
+                              offset: Offset(0, 2),
                             ),
-                          ),
+                          ],
+                        ),
+                        child: Column(
+                          crossAxisAlignment:
+                              CrossAxisAlignment.start,
+                          children: [
+                            // TANGGAL
 
-                          const SizedBox(height: 10),
+                            _label('Tanggal'),
 
-                          _label('Produk'),
-
-                          InkWell(
-                            onTap: () {
-                              _pilihProduk();
-                            },
-                            child: _field(
-                              produk.isEmpty ? 'Pilih Produk ▼' : produk,
+                            InkWell(
+                              onTap: _pilihTanggal,
+                              child: _field(tanggal),
                             ),
-                          ),
 
-                          const SizedBox(height: 10),
+                            const SizedBox(height: 12),
 
-                          _label('Nominal Setoran'),
+                            // OUTLET
 
-                          Container(
-                            height: 55,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFD0D5DB),
+                            _label('Outlet'),
+
+                            InkWell(
+                              onTap: _pilihOutlet,
+                              child: _field(
+                                outlet.isEmpty
+                                    ? 'Pilih Outlet ▼'
+                                    : '$outlet ▼',
                               ),
-                              borderRadius: BorderRadius.circular(6),
                             ),
-                            child: TextField(
+
+                            const SizedBox(height: 12),
+
+                            // PRODUK
+
+                            _label('Produk'),
+
+                            InkWell(
+                              onTap: _pilihProduk,
+                              child: _field(
+                                produk.isEmpty
+                                    ? 'Pilih Produk ▼'
+                                    : '$produk ▼',
+                              ),
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            // NOMINAL SETORAN
+
+                            _label('Nominal Setoran'),
+
+                            _inputField(
                               controller: nominalController,
+                              hint: 'Masukkan nominal uang...',
                               keyboardType: TextInputType.number,
-                              decoration: const InputDecoration(
-                                hintText: 'Masukkan nominal uang...',
-                                hintStyle: TextStyle(
-                                  fontSize: 9,
-                                  color: Color(0xFFB0BAC8),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 17,
-                                ),
-                              ),
                             ),
-                          ),
 
-                          const SizedBox(height: 10),
+                            const SizedBox(height: 12),
 
-                          _label('Catatan Tambahan'),
+                            // CATATAN TAMBAHAN
 
-                          Container(
-                            height: 55,
-                            decoration: BoxDecoration(
-                              border: Border.all(
-                                color: const Color(0xFFD0D5DB),
-                              ),
-                              borderRadius: BorderRadius.circular(6),
-                            ),
-                            child: TextField(
+                            _label('Catatan Tambahan'),
+
+                            _inputField(
                               controller: catatanController,
-                              decoration: const InputDecoration(
-                                hintText: 'Catatan tambahan (opsional)...',
-                                hintStyle: TextStyle(
-                                  fontSize: 9,
-                                  color: Color(0xFFB0BAC8),
-                                ),
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 17,
-                                ),
-                              ),
+                              hint: 'Catatan tambahan (opsional)...',
                             ),
-                          ),
 
-                          const Spacer(),
+                            const SizedBox(height: 22),
 
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              // ================= TOMBOL BATAL =================
-                              SizedBox(
-                                width: 105,
-                                height: 38,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.pop(context);
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFD9DCE0),
-                                    foregroundColor: const Color(0xFF60738F),
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                  ),
-                                  child: const Text(
-                                    'Batal',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                              ),
+                            // TOMBOL BATAL DAN SIMPAN
 
-                              const SizedBox(width: 10),
-
-                              // ================= TOMBOL SIMPAN =================
-                              SizedBox(
-                                width: 105,
-                                height: 38,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    if (outlet.isEmpty || produk.isEmpty) {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                          content: Text(
-                                            'Silakan pilih outlet dan produk terlebih dahulu.',
-                                          ),
-                                        ),
-                                      );
-                                      return;
-                                    }
-
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Data setoran berhasil disimpan.',
-                                        ),
+                            Row(
+                              mainAxisAlignment:
+                                  MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  width: 105,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor:
+                                          const Color(0xFFD9DCE0),
+                                      foregroundColor: mutedText,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(6),
                                       ),
-                                    );
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: const Color(0xFFFF6B00),
-                                    foregroundColor: Colors.white,
-                                    elevation: 0,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(6),
                                     ),
-                                  ),
-                                  child: const Text(
-                                    'Simpan',
-                                    style: TextStyle(
-                                      fontSize: 9,
-                                      fontWeight: FontWeight.bold,
+                                    child: const Text(
+                                      'Batal',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
+
+                                const SizedBox(width: 10),
+
+                                SizedBox(
+                                  width: 113,
+                                  height: 40,
+                                  child: ElevatedButton(
+                                    onPressed: _simpanSetoran,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: orange,
+                                      foregroundColor: Colors.white,
+                                      elevation: 0,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(6),
+                                      ),
+                                    ),
+                                    child: const Text(
+                                      'Simpan',
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
@@ -474,140 +439,221 @@ class _AdminSetoranPageState extends State<AdminSetoranPage> {
     );
   }
 
-// ================= SIDEBAR BOX =================
+  // =====================================================
+  // SIDEBAR UTAMA
+  // =====================================================
 
-static Widget _sideBox({
-  required BuildContext context,
-  required String title,
-  required List<String> items,
-  required int activeIndex,
-}) {
-  return Container(
-    width: 130,
-    padding: const EdgeInsets.symmetric(
-      horizontal: 10,
-      vertical: 8,
-    ),
-    decoration: BoxDecoration(
-      color: const Color(0xFFFFF7EF),
-      borderRadius: BorderRadius.circular(6),
-    ),
-    child: Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          title,
-          style: const TextStyle(
-            fontSize: 8,
-            fontWeight: FontWeight.bold,
-            color: Color(0xFF60738F),
-          ),
+  Widget _buildSidebar() {
+    return Container(
+      width: 180,
+      color: Colors.white,
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.fromLTRB(
+          12,
+          25,
+          12,
+          20,
         ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // LOGO
 
-        const SizedBox(height: 5),
+            const Padding(
+              padding: EdgeInsets.only(left: 23),
+              child: Text(
+                'FOOD FLOW',
+                style: TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.w900,
+                  color: orange,
+                ),
+              ),
+            ),
 
-        ...List.generate(
-          items.length,
-          (index) {
+            const SizedBox(height: 32),
+
+            // MAIN MENU
+
+            _sideBox(
+              title: 'MAIN MENU',
+              items: const [
+                'Dashboard',
+              ],
+              activeItem: null,
+            ),
+
+            const SizedBox(height: 12),
+
+            // KEUANGAN
+
+            _sideBox(
+              title: 'KEUANGAN',
+              items: const [
+                'Setoran',
+                'Bagi Hasil',
+                'Struk Transparansi',
+              ],
+              activeItem: 'Setoran',
+            ),
+
+            const SizedBox(height: 12),
+
+            // LAPORAN
+
+            _sideBox(
+              title: 'LAPORAN',
+              items: const [
+                'Laporan Keuangan',
+              ],
+              activeItem: null,
+            ),
+
+            const SizedBox(height: 12),
+
+            // AKUN — HANYA LOGOUT
+
+            _sideBox(
+              title: 'AKUN',
+              items: const [
+                'Logout',
+              ],
+              activeItem: null,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // KOTAK SIDEBAR
+  // =====================================================
+
+  Widget _sideBox({
+    required String title,
+    required List<String> items,
+    required String? activeItem,
+  }) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 9,
+      ),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFFF7EF),
+        borderRadius: BorderRadius.circular(7),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // JUDUL KATEGORI TETAP ABU-ABU
+
+          Text(
+            title,
+            style: const TextStyle(
+              fontSize: 8,
+              fontWeight: FontWeight.bold,
+              color: sidebarTitle,
+            ),
+          ),
+
+          const SizedBox(height: 7),
+
+          // ITEM MENU BERWARNA ORANYE
+
+          ...items.map((item) {
+            final bool isActive = item == activeItem;
+
             return Padding(
-              padding: const EdgeInsets.only(bottom: 3),
-              child: SizedBox(
-                width: double.infinity,
-                height: 24,
-                child: TextButton(
-                  onPressed: () {
-                    _navigate(
-                      context,
-                      items[index],
-                    );
-                  },
-                  style: TextButton.styleFrom(
-                    alignment: Alignment.centerLeft,
+              padding: const EdgeInsets.only(
+                bottom: 5,
+              ),
+              child: InkWell(
+                mouseCursor: SystemMouseCursors.click,
+                borderRadius: BorderRadius.circular(4),
+                onTap: () {
+                  if (item == 'Logout') {
+                    _showLogoutDialog(context);
+                  } else {
+                    _navigateAdmin(item);
+                  }
+                },
+                child: SizedBox(
+                  width: double.infinity,
+                  child: Padding(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 2,
+                      vertical: 3,
                     ),
-                    minimumSize: const Size(
-                      double.infinity,
-                      24,
-                    ),
-                    tapTargetSize:
-                        MaterialTapTargetSize.shrinkWrap,
-                  ),
-                  child: Text(
-                    '• ${items[index]}',
-                    style: TextStyle(
-                      fontSize: 9,
-                      color: index == activeIndex
-                          ? const Color(0xFFFF6B00)
-                          : const Color(0xFF60738F),
+                    child: Text(
+                      '• $item',
+                      style: TextStyle(
+                        fontSize: 10,
+                        color: orange,
+                        fontWeight: isActive
+                            ? FontWeight.bold
+                            : FontWeight.w500,
+                      ),
                     ),
                   ),
                 ),
               ),
             );
-          },
+          }),
+        ],
+      ),
+    );
+  }
+
+  // =====================================================
+  // NAVIGASI ADMIN
+  // =====================================================
+
+  void _navigateAdmin(String item) {
+    Widget? destination;
+
+    switch (item) {
+      case 'Dashboard':
+        destination = const AdminDashboardPage();
+        break;
+
+      case 'Setoran':
+        destination = const AdminSetoranPage();
+        break;
+
+      case 'Bagi Hasil':
+        destination = const AdminBagiHasilPage();
+        break;
+
+      case 'Struk Transparansi':
+        destination = const StrukTransparansiPage();
+        break;
+
+      case 'Laporan Keuangan':
+        destination = const AdminLaporanKeuanganPage();
+        break;
+    }
+
+    if (destination != null) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (_) => destination!,
         ),
-      ],
-    ),
-  );
-}
-
-// ================= NAVIGASI ADMIN =================
-
-static void _navigate(
-  BuildContext context,
-  String item,
-) {
-  if (item == 'Dashboard') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminDashboardPage(),
-      ),
-    );
+      );
+    }
   }
 
-  if (item == 'Setoran') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminSetoranPage(),
-      ),
-    );
-  }
+  // =====================================================
+  // LABEL FORM
+  // =====================================================
 
-  if (item == 'Bagi Hasil') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminBagiHasilPage(),
-      ),
-    );
-  }
-
-  if (item == 'Struk Transparansi') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const StrukTransparansiPage(),
-      ),
-    );
-  }
-
-  if (item == 'Laporan Keuangan') {
-    Navigator.pushReplacement(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminLaporanKeuanganPage(),
-      ),
-    );
-  }
-}
-  // ================= LABEL =================
-
-  static Widget _label(String text) {
+  Widget _label(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 5),
+      padding: const EdgeInsets.only(
+        bottom: 5,
+      ),
       child: Text(
         text,
         style: const TextStyle(
@@ -619,12 +665,14 @@ static void _navigate(
     );
   }
 
-  // ================= FIELD =================
+  // =====================================================
+  // FIELD TAMPILAN
+  // =====================================================
 
-  static Widget _field(String text) {
+  Widget _field(String text) {
     return Container(
       width: double.infinity,
-      height: 44,
+      height: 45,
       alignment: Alignment.center,
       decoration: BoxDecoration(
         color: const Color(0xFFFAFBFC),
@@ -642,6 +690,7 @@ static void _navigate(
       ),
       child: Text(
         text,
+        textAlign: TextAlign.center,
         style: const TextStyle(
           fontSize: 9,
           color: Color(0xFFB0B8C4),
@@ -650,6 +699,94 @@ static void _navigate(
     );
   }
 
+  // =====================================================
+  // INPUT TEXT
+  // =====================================================
+
+  Widget _inputField({
+    required TextEditingController controller,
+    required String hint,
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Container(
+      height: 55,
+      decoration: BoxDecoration(
+        color: const Color(0xFFFAFBFC),
+        border: Border.all(
+          color: const Color(0xFFD0D5DB),
+        ),
+        borderRadius: BorderRadius.circular(6),
+        boxShadow: const [
+          BoxShadow(
+            color: Color(0x11000000),
+            blurRadius: 2,
+            offset: Offset(0, 1),
+          ),
+        ],
+      ),
+      child: TextField(
+        controller: controller,
+        keyboardType: keyboardType,
+        style: const TextStyle(
+          fontSize: 10,
+          color: Color(0xFF243247),
+        ),
+        decoration: InputDecoration(
+          hintText: hint,
+          hintStyle: const TextStyle(
+            fontSize: 9,
+            color: Color(0xFFB0BAC8),
+          ),
+          border: InputBorder.none,
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 18,
+          ),
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // SIMPAN SETORAN
+  // =====================================================
+
+  void _simpanSetoran() {
+    if (outlet.isEmpty || produk.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Silakan pilih outlet dan produk terlebih dahulu.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    if (nominalController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Silakan masukkan nominal setoran.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(
+        content: Text(
+          'Data setoran berhasil disimpan.',
+        ),
+      ),
+    );
+  }
+
+  // =====================================================
+  // DIALOG LOGOUT
+  // =====================================================
+
   void _showLogoutDialog(BuildContext context) {
     showDialog(
       context: context,
@@ -657,29 +794,34 @@ static void _navigate(
         return AlertDialog(
           title: const Text(
             'Yakin ingin keluar?',
-            style: TextStyle(fontWeight: FontWeight.bold),
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
           content: const Text(
             'Anda akan keluar dari akun FoodFlow saat ini.',
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(dialogContext),
+              onPressed: () {
+                Navigator.pop(dialogContext);
+              },
               child: const Text('Batal'),
             ),
             ElevatedButton(
               onPressed: () {
                 Navigator.pop(dialogContext);
+
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
+                    builder: (_) => const LoginPage(),
                   ),
                   (route) => false,
                 );
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFFF6B00),
+                backgroundColor: orange,
                 foregroundColor: Colors.white,
               ),
               child: const Text('Ya'),
