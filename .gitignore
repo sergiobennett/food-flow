@@ -50,3 +50,6 @@ app.*.map.json
 # Environment variables and secrets
 .env
 **/.env
+
+# Dashboard PHP - Local Database Credentials
+/foodflow_dashboard/koneksi.php
